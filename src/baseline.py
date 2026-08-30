@@ -10,8 +10,8 @@ class BaselineAnalyzer:
     def __init__(self):
         # Initialize the Groq client. It automatically finds the API key in your environment.
         self.client = Groq()
-        # We use Llama 3.1 70B because it is highly capable and free on Groq
-        self.model = "llama-3.1-70b-versatile" 
+        # We use GPT OSS 20B on Groq - fast and capable
+        self.model = "openai/gpt-oss-20b"
 
     def analyze(self, contract_text: str) -> str:
         """
@@ -45,6 +45,9 @@ class BaselineAnalyzer:
 
 # --- Testing Code ---
 if __name__ == "__main__":
+    import sys
+    # Fix Unicode printing on Windows terminals (cp1252 can't handle all Unicode chars)
+    sys.stdout.reconfigure(encoding='utf-8', errors='replace')
     print("1. Ingesting the 'Seeded' contract...")
     ingestion = IngestionPipeline()
     
