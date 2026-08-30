@@ -1,0 +1,10 @@
+STATEMENT OF WORK
+
+Section 1. Services
+The Freelancer agrees to provide web development services as outlined in Appendix A.
+
+Section 2. Payment Terms
+Client shall pay Freelancer within 15 days of invoice receipt.
+
+Section 3. IP Ownership
+Freelancer retains all rights to pre-existing background IP. Custom code written specifically for this project transfers to the Client upon full payment.

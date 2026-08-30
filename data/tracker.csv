@@ -1,0 +1,2 @@
+contract_id,clause_ref,risk_type,severity,description
+sow_002_seeded.txt,Section 3,ip_ownership,must_raise,IP assignment scope intentionally includes freelancer's past work and background IP.
