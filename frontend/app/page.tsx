@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle } from 'lucide-react';
 
 export interface Finding {
   clause_ref: string;
@@ -31,6 +31,17 @@ export default function Home() {
       reportRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [report]);
+
+  const getCategoryIcon = (category: string) => {
+    switch (category) {
+      case 'payment_terms': return <DollarSign className="w-4 h-4 mr-1" />;
+      case 'liability_cap': return <ShieldAlert className="w-4 h-4 mr-1" />;
+      case 'ip_ownership': return <Copyright className="w-4 h-4 mr-1" />;
+      case 'kill_fee': return <Briefcase className="w-4 h-4 mr-1" />;
+      case 'indemnification': return <FileWarning className="w-4 h-4 mr-1" />;
+      default: return <AlertTriangle className="w-4 h-4 mr-1" />;
+    }
+  };
 
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
@@ -342,17 +353,29 @@ export default function Home() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.4, delay: 0.1 * idx }}
-                        className="glass-panel rounded-xl p-6 border-l-4 border-slate-600 hover:border-blue-500 transition-colors"
+                        className={`glass-panel rounded-xl p-6 border-l-4 transition-colors ${
+                          finding.severity === 'must_raise' 
+                          ? 'border-l-red-500 hover:border-l-red-400' 
+                          : 'border-l-yellow-500 hover:border-l-yellow-400'
+                        }`}
                       >
-                        <div className="flex justify-between items-start mb-4">
-                          <div className="flex items-center space-x-3">
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider">
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider">
+                              {getCategoryIcon(finding.category)}
                               {finding.category.replace('_', ' ')}
                             </span>
-                            <span className="text-sm text-slate-400 font-medium">
-                              Ref: {finding.clause_ref}
+                            <span className={`px-3 py-1.5 rounded-full text-xs font-bold uppercase tracking-wider border ${
+                              finding.severity === 'must_raise'
+                              ? 'bg-red-500/10 text-red-400 border-red-500/30'
+                              : 'bg-yellow-500/10 text-yellow-400 border-yellow-500/30'
+                            }`}>
+                              {finding.severity.replace('_', ' ')}
                             </span>
                           </div>
+                          <span className="text-xs text-slate-400 font-medium bg-slate-900/50 px-2 py-1 rounded">
+                            Ref: {finding.clause_ref}
+                          </span>
                         </div>
                         
                         <div className="bg-slate-900/50 rounded-lg p-4 mb-4 border border-slate-800/80">
@@ -360,8 +383,8 @@ export default function Home() {
                         </div>
                         
                         <div>
-                          <h4 className="text-sm font-semibold text-slate-400 mb-1 uppercase tracking-wide">Risk Explanation</h4>
-                          <p className="text-slate-200 leading-relaxed">{finding.explanation}</p>
+                          <h4 className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">Risk Explanation</h4>
+                          <p className="text-slate-200 leading-relaxed text-sm">{finding.explanation}</p>
                         </div>
                       </motion.div>
                     ))}
