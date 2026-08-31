@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle, Sparkles, Copy, Check } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle, Sparkles, Copy, Check, MessageSquare, X, Send } from 'lucide-react';
 
 export interface Finding {
   clause_ref: string;
@@ -28,6 +28,23 @@ export default function Home() {
   const [loadingAlternatives, setLoadingAlternatives] = useState<Record<number, boolean>>({});
   const [safeClauses, setSafeClauses] = useState<Record<number, string>>({});
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+
+  // Chatbot State
+  const [contractText, setContractText] = useState<string | null>(null);
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [chatInput, setChatInput] = useState('');
+  const [chatMessages, setChatMessages] = useState<{role: 'user'|'bot', content: string}[]>([
+    { role: 'bot', content: 'Hi! I have read your contract. What would you like to know?' }
+  ]);
+  const [isChatLoading, setIsChatLoading] = useState(false);
+  const chatScrollRef = useRef<HTMLDivElement>(null);
+
+  // Auto-scroll chat to bottom
+  useEffect(() => {
+    if (chatScrollRef.current) {
+      chatScrollRef.current.scrollTop = chatScrollRef.current.scrollHeight;
+    }
+  }, [chatMessages]);
 
   // Auto-scroll to report when it's generated
   const reportRef = useRef<HTMLDivElement>(null);
@@ -81,6 +98,8 @@ export default function Home() {
     setFindings(null);
     setScore(null);
     setSafeClauses({});
+    setContractText(null);
+    setChatMessages([{ role: 'bot', content: 'Hi! I have read your contract. What would you like to know?' }]);
   };
 
   const onButtonClick = () => {
@@ -99,6 +118,8 @@ export default function Home() {
     setFindings(null);
     setScore(null);
     setSafeClauses({});
+    setContractText(null);
+    setChatMessages([{ role: 'bot', content: 'Hi! I have read your contract. What would you like to know?' }]);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -119,6 +140,7 @@ export default function Home() {
         setReport(data.report);
         if (data.findings) setFindings(data.findings);
         if (data.score !== undefined) setScore(data.score);
+        if (data.contract_text) setContractText(data.contract_text);
       } else {
         throw new Error("Invalid response format from server.");
       }
@@ -159,6 +181,32 @@ export default function Home() {
     navigator.clipboard.writeText(text);
     setCopiedIdx(idx);
     setTimeout(() => setCopiedIdx(null), 2000);
+  };
+
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!chatInput.trim() || !contractText) return;
+
+    const userMsg = chatInput.trim();
+    setChatInput('');
+    setChatMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    setIsChatLoading(true);
+
+    try {
+      const response = await fetch('http://localhost:8000/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ contract_text: contractText, question: userMsg })
+      });
+      if (!response.ok) throw new Error("Chat failed");
+      
+      const data = await response.json();
+      setChatMessages(prev => [...prev, { role: 'bot', content: data.answer }]);
+    } catch (err) {
+      setChatMessages(prev => [...prev, { role: 'bot', content: "Sorry, I couldn't process that question right now." }]);
+    } finally {
+      setIsChatLoading(false);
+    }
   };
 
   return (
@@ -481,6 +529,92 @@ export default function Home() {
 
         </div>
       </div>
+
+      {/* Floating Chat UI */}
+      <AnimatePresence>
+        {contractText && (
+          <motion.div 
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+          >
+            {/* Chat Window */}
+            <AnimatePresence>
+              {isChatOpen && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.9, y: 20 }}
+                  animate={{ opacity: 1, scale: 1, y: 0 }}
+                  exit={{ opacity: 0, scale: 0.9, y: 20 }}
+                  className="bg-slate-900 border border-slate-700 shadow-2xl rounded-2xl w-80 sm:w-96 h-[500px] mb-4 flex flex-col overflow-hidden"
+                >
+                  {/* Header */}
+                  <div className="bg-slate-800 p-4 border-b border-slate-700 flex justify-between items-center">
+                    <div className="flex items-center space-x-2">
+                      <ShieldCheck className="w-5 h-5 text-blue-400" />
+                      <h3 className="font-bold text-slate-200">ClauseGuard Assistant</h3>
+                    </div>
+                    <button onClick={() => setIsChatOpen(false)} className="text-slate-400 hover:text-white transition">
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+                  
+                  {/* Messages */}
+                  <div ref={chatScrollRef} className="flex-1 p-4 overflow-y-auto flex flex-col space-y-4">
+                    {chatMessages.map((msg, i) => (
+                      <div key={i} className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}>
+                        <div className={`max-w-[85%] rounded-xl p-3 text-sm leading-relaxed ${
+                          msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
+                        }`}>
+                          <ReactMarkdown className="prose prose-invert prose-sm max-w-none">{msg.content}</ReactMarkdown>
+                        </div>
+                      </div>
+                    ))}
+                    {isChatLoading && (
+                      <div className="flex justify-start">
+                        <div className="bg-slate-800 border border-slate-700 rounded-xl rounded-bl-none p-4 flex space-x-2 items-center">
+                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"></div>
+                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-100"></div>
+                          <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce delay-200"></div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Input */}
+                  <form onSubmit={handleSendMessage} className="p-3 bg-slate-800 border-t border-slate-700 flex items-center space-x-2">
+                    <input 
+                      type="text" 
+                      value={chatInput}
+                      onChange={(e) => setChatInput(e.target.value)}
+                      placeholder="Ask about your contract..." 
+                      className="flex-1 bg-slate-900 border border-slate-700 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 text-white"
+                      disabled={isChatLoading}
+                    />
+                    <button 
+                      type="submit" 
+                      disabled={!chatInput.trim() || isChatLoading}
+                      className="p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Send className="w-4 h-4" />
+                    </button>
+                  </form>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            {/* Chat Toggle Button */}
+            {!isChatOpen && (
+              <button 
+                onClick={() => setIsChatOpen(true)}
+                className="bg-blue-600 hover:bg-blue-500 text-white p-4 rounded-full shadow-[0_0_20px_rgba(37,99,235,0.4)] hover:shadow-[0_0_25px_rgba(37,99,235,0.6)] transition-all flex items-center justify-center group"
+              >
+                <MessageSquare className="w-6 h-6 group-hover:scale-110 transition-transform" />
+              </button>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
+
     </main>
   );
 }
