@@ -1,15 +1,15 @@
 import json
 from dotenv import load_dotenv
-from groq import Groq
+from groq import AsyncGroq
 
 load_dotenv()
 
 class ReportSynthesizer:
     def __init__(self):
-        self.client = Groq()
+        self.client = AsyncGroq()
         self.model = "openai/gpt-oss-120b"
 
-    def generate_report(self, verified_findings: list) -> str:
+    async def generate_report(self, verified_findings: list) -> str:
         """
         Generates a professional markdown report.
         Combines a deterministic header/disclaimer with an LLM-synthesized summary.
@@ -38,7 +38,7 @@ class ReportSynthesizer:
         """
         
         try:
-            response = self.client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Here are the verified findings to format:\n\n{findings_json}"}
@@ -67,24 +67,31 @@ class ReportSynthesizer:
 # --- Testing Code ---
 if __name__ == "__main__":
     import os
+    import asyncio
     from .ingestion import IngestionPipeline
     from .analyzer import StructuredAnalyzer
     from .verifier import DeterministicVerifier
+    from .semantic_verifier import SemanticVerifier
     
-    print("Running the COMPLETE ClauseGuard Pipeline...\n")
-    
-    test_path = os.path.join(os.path.dirname(__file__), "../contracts/sow_002_seeded.txt")
-    
-    # 1. Ingest
-    parsed_text = IngestionPipeline().process(test_path)["parsed_text"]
-    
-    # 2. Analyze
-    findings = StructuredAnalyzer().analyze(parsed_text).get("findings", [])
-    
-    # 3. Verify
-    verified = DeterministicVerifier().verify(findings, parsed_text)
-    
-    # 4. Synthesize
-    report = ReportSynthesizer().generate_report(verified)
-    
-    print(report)
+    async def run_test():
+        print("Running the COMPLETE ClauseGuard Pipeline...\n")
+        
+        test_path = os.path.join(os.path.dirname(__file__), "../contracts/sow_002_seeded.txt")
+        
+        # 1. Ingest
+        parsed_text = IngestionPipeline().process(test_path)["parsed_text"]
+        
+        # 2. Analyze
+        findings = await StructuredAnalyzer().analyze(parsed_text)
+        findings = findings.get("findings", [])
+        
+        # 3. Verify
+        det_verified = DeterministicVerifier().verify(findings, parsed_text)
+        sem_verified = await SemanticVerifier().verify_interpretation(det_verified)
+        
+        # 4. Synthesize
+        report = await ReportSynthesizer().generate_report(sem_verified)
+        
+        print(report)
+        
+    asyncio.run(run_test())

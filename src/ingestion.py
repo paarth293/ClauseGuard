@@ -45,18 +45,24 @@ class IngestionPipeline:
             return f.read()
 
     def _parse_pdf(self, file_path: str) -> str:
-        text_blocks = []
-        with pdfplumber.open(file_path) as pdf:
-            for page in pdf.pages:
-                page_text = page.extract_text()
-                if page_text:
-                    text_blocks.append(page_text)
-        return "\n".join(text_blocks)
+        try:
+            text_blocks = []
+            with pdfplumber.open(file_path) as pdf:
+                for page in pdf.pages:
+                    page_text = page.extract_text()
+                    if page_text:
+                        text_blocks.append(page_text)
+            return "\n".join(text_blocks)
+        except Exception as e:
+            raise RuntimeError(f"Failed to parse PDF document. It may be corrupted or encrypted: {str(e)}")
 
     def _parse_docx(self, file_path: str) -> str:
-        doc = docx.Document(file_path)
-        text_blocks = [para.text for para in doc.paragraphs if para.text.strip()]
-        return "\n".join(text_blocks)
+        try:
+            doc = docx.Document(file_path)
+            text_blocks = [para.text for para in doc.paragraphs if para.text.strip()]
+            return "\n".join(text_blocks)
+        except Exception as e:
+            raise RuntimeError(f"Failed to parse DOCX document. It may be corrupted: {str(e)}")
 
 if __name__ == "__main__":
     pipeline = IngestionPipeline()

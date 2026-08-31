@@ -1,18 +1,18 @@
 import os
 import json
 from dotenv import load_dotenv
-from groq import Groq
+from groq import AsyncGroq
 from .ingestion import IngestionPipeline
 
 load_dotenv()
 
 class StructuredAnalyzer:
     def __init__(self):
-        self.client = Groq()
+        self.client = AsyncGroq()
         # llama3-70b-8192 is the most reliable Groq model for strict JSON output
         self.model = "openai/gpt-oss-120b"
 
-    def analyze(self, contract_text: str) -> dict:
+    async def analyze(self, contract_text: str) -> dict:
         """
         Analyzes the contract and forces the LLM to return strict JSON data.
         This provides structured findings that our code can programmatically verify.
@@ -54,7 +54,7 @@ CRITICAL RULES:
         user_prompt = f"=== DOCUMENT DATA BEGIN ===\n{contract_text}\n=== DOCUMENT DATA END ==="
 
         try:
-            response = self.client.chat.completions.create(
+            response = await self.client.chat.completions.create(
                 messages=[
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}
@@ -75,21 +75,27 @@ CRITICAL RULES:
 
 # --- Testing Code ---
 if __name__ == "__main__":
-    print("1. Ingesting the 'Seeded' contract...")
-    ingestion = IngestionPipeline()
-    test_path = os.path.join(os.path.dirname(__file__), "../contracts/sow_002_seeded.txt")
-    ingest_result = ingestion.process(test_path)
-    
-    if ingest_result["status"] == "SUCCESS":
-        print("2. Running Structured Analysis (Strict JSON)...")
-        analyzer = StructuredAnalyzer()
+    import asyncio
+    from .ingestion import IngestionPipeline
+
+    async def run_test():
+        print("1. Ingesting the 'Seeded' contract...")
+        ingestion = IngestionPipeline()
+        test_path = os.path.join(os.path.dirname(__file__), "../contracts/sow_002_seeded.txt")
+        ingest_result = ingestion.process(test_path)
         
-        result_data = analyzer.analyze(ingest_result["parsed_text"])
-        
-        print("\n" + "="*50)
-        print("STRUCTURED FINDINGS:")
-        print("="*50)
-        # json.dumps makes the dictionary print beautifully in the terminal
-        print(json.dumps(result_data, indent=4))
-        
-        print(f"\nTotal Risks Found: {len(result_data.get('findings', []))}")
+        if ingest_result["status"] == "SUCCESS":
+            print("2. Running Structured Analysis (Strict JSON)...")
+            analyzer = StructuredAnalyzer()
+            
+            result_data = await analyzer.analyze(ingest_result["parsed_text"])
+            
+            print("\n" + "="*50)
+            print("STRUCTURED FINDINGS:")
+            print("="*50)
+            # json.dumps makes the dictionary print beautifully in the terminal
+            print(json.dumps(result_data, indent=4))
+            
+            print(f"\nTotal Risks Found: {len(result_data.get('findings', []))}")
+            
+    asyncio.run(run_test())

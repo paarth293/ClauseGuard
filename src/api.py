@@ -1,5 +1,6 @@
 import os
 import tempfile
+import asyncio
 from fastapi import FastAPI, UploadFile, File
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
@@ -44,7 +45,9 @@ async def analyze_contract(file: UploadFile = File(...)):
     try:
         # 2. Run the file through the exact pipeline we built
         print("Ingesting...")
-        ingest_result = IngestionPipeline().process(temp_path)
+        # Run synchronous ingestion in a thread pool so it doesn't block FastAPI
+        ingestion = IngestionPipeline()
+        ingest_result = await asyncio.to_thread(ingestion.process, temp_path)
         
         if ingest_result["status"] != "SUCCESS":
             return {"error": f"Ingestion failed: {ingest_result.get('error')}"}
@@ -52,14 +55,15 @@ async def analyze_contract(file: UploadFile = File(...)):
         parsed_text = ingest_result["parsed_text"]
         
         print("Analyzing...")
-        raw_findings = StructuredAnalyzer().analyze(parsed_text).get("findings", [])
+        analyzer_result = await StructuredAnalyzer().analyze(parsed_text)
+        raw_findings = analyzer_result.get("findings", [])
         
         print("Verifying...")
         det_verified = DeterministicVerifier().verify(raw_findings, parsed_text)
-        sem_verified = SemanticVerifier().verify_interpretation(det_verified)
+        sem_verified = await SemanticVerifier().verify_interpretation(det_verified)
         
         print("Synthesizing Report...")
-        final_report = ReportSynthesizer().generate_report(sem_verified)
+        final_report = await ReportSynthesizer().generate_report(sem_verified)
         
         # Return the final report as JSON to Next.js
         print("Success! Sending report back to frontend.")
