@@ -210,7 +210,7 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0f172a] text-slate-50 overflow-hidden relative selection:bg-blue-500/30">
+    <main className="min-h-screen bg-[#0f172a] text-slate-50 overflow-hidden relative selection:bg-blue-500/30 print:bg-white print:text-black">
       
       {/* Dynamic Background Elements */}
       <div className="fixed inset-0 z-0 pointer-events-none print:hidden">
@@ -399,8 +399,8 @@ export default function Home() {
                   >
                     <div className="flex flex-col md:flex-row items-center justify-between">
                       <div className="mb-6 md:mb-0 text-center md:text-left">
-                        <h3 className="text-xl font-bold mb-2">Contract Safety Score</h3>
-                        <p className="text-slate-400 text-sm max-w-sm">
+                        <h3 className="text-xl font-bold mb-2 print:text-black">Contract Safety Score</h3>
+                        <p className="text-slate-400 text-sm max-w-sm print:text-slate-700">
                           {score >= 80 ? 'This contract is highly favorable and safe. Minor issues only.' 
                             : score >= 50 ? 'Proceed with caution. Some terms are risky and need negotiation.' 
                             : 'High risk! Major red flags detected. Do not sign without revisions.'}
@@ -427,7 +427,7 @@ export default function Home() {
                           }}>
                             {score}
                           </span>
-                          <span className="text-xs text-slate-400 font-medium -mt-1">/ 100</span>
+                          <span className="text-xs text-slate-400 font-medium -mt-1 print:text-slate-600">/ 100</span>
                         </div>
                       </div>
                     </div>
@@ -437,7 +437,7 @@ export default function Home() {
                 {/* Findings UI Cards */}
                 {findings && findings.length > 0 ? (
                   <div className="space-y-6">
-                    <h3 className="text-xl font-bold mb-4 flex items-center">
+                    <h3 className="text-xl font-bold mb-4 flex items-center print:text-black">
                       <AlertCircle className="w-5 h-5 mr-2 text-blue-400" />
                       Detailed Findings ({findings.length})
                     </h3>
@@ -456,7 +456,7 @@ export default function Home() {
                       >
                         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-3">
                           <div className="flex flex-wrap items-center gap-2">
-                            <span className="flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider">
+                            <span className="flex items-center px-3 py-1.5 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider print:bg-slate-100 print:text-slate-800 print:border-slate-300">
                               {getCategoryIcon(finding.category)}
                               {finding.category.replace('_', ' ')}
                             </span>
@@ -468,18 +468,18 @@ export default function Home() {
                               {finding.severity.replace('_', ' ')}
                             </span>
                           </div>
-                          <span className="text-xs text-slate-400 font-medium bg-slate-900/50 px-2 py-1 rounded">
+                          <span className="text-xs text-slate-400 font-medium bg-slate-900/50 px-2 py-1 rounded print:bg-slate-200 print:text-slate-800">
                             Ref: {finding.clause_ref}
                           </span>
                         </div>
                         
-                        <div className="bg-slate-900/50 rounded-lg p-4 mb-4 border border-slate-800/80">
-                          <p className="text-slate-300 italic font-serif text-sm">"{finding.quote}"</p>
+                        <div className="bg-slate-900/50 rounded-lg p-4 mb-4 border border-slate-800/80 print:bg-slate-50 print:border-slate-300">
+                          <p className="text-slate-300 italic font-serif text-sm print:text-slate-900 print:not-italic print:font-sans print:text-base">"{finding.quote}"</p>
                         </div>
                         
                         <div>
-                          <h4 className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">Risk Explanation</h4>
-                          <p className="text-slate-200 leading-relaxed text-sm mb-4 print:text-black">{finding.explanation}</p>
+                          <h4 className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide print:text-slate-700">Risk Explanation</h4>
+                          <p className="text-slate-200 leading-relaxed text-sm mb-4 print:text-black print:text-base">{finding.explanation}</p>
                           
                           {!safeClauses[idx] && (
                             <button
