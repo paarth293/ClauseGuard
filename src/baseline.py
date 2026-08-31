@@ -10,8 +10,8 @@ class BaselineAnalyzer:
     def __init__(self):
         # Initialize the Groq client. It automatically finds the API key in your environment.
         self.client = Groq()
-        # We use GPT OSS 20B on Groq - fast and capable
-        self.model = "openai/gpt-oss-20b"
+        # We use Llama 3.1 70B on Groq - fast and capable
+        self.model = "llama-3.1-70b-versatile"
 
     def analyze(self, contract_text: str) -> str:
         """
