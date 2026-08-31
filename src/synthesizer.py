@@ -7,7 +7,7 @@ load_dotenv()
 class ReportSynthesizer:
     def __init__(self):
         self.client = Groq()
-        self.model = "llama-3.1-70b-versatile"
+        self.model = "openai/gpt-oss-120b"
 
     def generate_report(self, verified_findings: list) -> str:
         """

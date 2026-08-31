@@ -1,4 +1,5 @@
 import os
+import tempfile
 from fastapi import FastAPI, UploadFile, File
 import uvicorn
 from fastapi.middleware.cors import CORSMiddleware
@@ -34,10 +35,11 @@ async def analyze_contract(file: UploadFile = File(...)):
     """
     print(f"\n--- API Request Received: {file.filename} ---")
     
-    # 1. Save the uploaded file temporarily so our ingestion script can read it
-    temp_path = f"temp_{file.filename}"
-    with open(temp_path, "wb") as buffer:
-        buffer.write(await file.read())
+    # 1. Save the uploaded file to the OS temp directory (always writable)
+    suffix = os.path.splitext(file.filename)[-1]  # preserve .pdf/.docx/.txt
+    with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+        tmp.write(await file.read())
+        temp_path = tmp.name
         
     try:
         # 2. Run the file through the exact pipeline we built

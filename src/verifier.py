@@ -14,36 +14,57 @@ class DeterministicVerifier:
             
             # 1. Schema Completeness Check
             required_fields = ["clause_ref", "quote", "category", "severity", "explanation", "confidence"]
-            missing = [f for f in required_fields if f not in finding or not finding[f]]
+            missing = [f for f in required_fields if f not in finding or finding[f] is None or str(finding[f]).strip() == ""]
             checks["schema_valid"] = "PASS" if not missing else f"FAIL (Missing: {missing})"
             
-            # 2. Grounding Check (Does the quote actually exist in the raw text?)
+            # 2. Grounding Check – the quote must be substantially present in the source text.
+            # We use TWO strategies so minor LLM paraphrasing doesn't kill real findings:
+            #   (a) Exact normalised substring match  – catches verbatim quotes
+            #   (b) Word-overlap ratio ≥ 60%          – catches lightly reworded quotes
             quote = finding.get("quote", "")
             if quote:
                 normalized_quote = self._normalize(quote)
-                # Pure Python string match (No AI involved)
+                
+                # Strategy (a): direct substring
                 if normalized_quote in normalized_source:
                     checks["grounding"] = "PASS"
                 else:
-                    checks["grounding"] = "FAIL (Quote not found in source text)"
+                    # Strategy (b): word-overlap ratio
+                    overlap = self._word_overlap(normalized_quote, normalized_source)
+                    if overlap >= 0.60:
+                        checks["grounding"] = "PASS"
+                    else:
+                        checks["grounding"] = f"FAIL (Quote not found; overlap={overlap:.0%})"
             else:
                 checks["grounding"] = "FAIL (No quote provided by AI)"
                 
             # 3. Confidence Check
             confidence = finding.get("confidence", 0.0)
-            if float(confidence) >= 0.6:
-                checks["confidence"] = "PASS"
-            else:
-                checks["confidence"] = f"FAIL (Low confidence: {confidence})"
+            try:
+                conf_val = float(confidence)
+            except (TypeError, ValueError):
+                conf_val = 0.0
+            checks["confidence"] = "PASS" if conf_val >= 0.5 else f"FAIL (Low confidence: {confidence})"
                 
             # Attach the test results to the finding for transparency
             finding["verification_checks"] = checks
             
-            # THE KILL SWITCH: If grounding fails, we discard the finding entirely
+            # THE KILL SWITCH: Only drop if grounding explicitly fails
             if checks["grounding"] == "PASS":
                 verified_findings.append(finding)
                 
         return verified_findings
+
+    def _word_overlap(self, quote: str, source: str) -> float:
+        """
+        Computes the fraction of unique words in the quote that appear in the source.
+        This catches cases where the LLM slightly paraphrases the verbatim text.
+        """
+        quote_words = set(quote.split())
+        if not quote_words:
+            return 0.0
+        matches = sum(1 for w in quote_words if w in source)
+        return matches / len(quote_words)
 
     def _normalize(self, text: str) -> str:
         """

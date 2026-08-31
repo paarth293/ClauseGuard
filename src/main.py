@@ -1,5 +1,9 @@
 import sys
 import time
+
+# Fix Unicode printing on Windows terminals (cp1252 cannot handle all Unicode chars)
+sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 from .ingestion import IngestionPipeline
 from .analyzer import StructuredAnalyzer
 from .verifier import DeterministicVerifier

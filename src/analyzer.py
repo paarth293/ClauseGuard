@@ -9,7 +9,8 @@ load_dotenv()
 class StructuredAnalyzer:
     def __init__(self):
         self.client = Groq()
-        self.model = "llama-3.1-70b-versatile"
+        # llama3-70b-8192 is the most reliable Groq model for strict JSON output
+        self.model = "openai/gpt-oss-120b"
 
     def analyze(self, contract_text: str) -> dict:
         """
@@ -19,26 +20,36 @@ class StructuredAnalyzer:
         
         # The System Prompt is where we define the strict JSON schema
         system_prompt = """
-        You are ClauseGuard, an expert legal AI reviewing freelancer contracts.
-        Your ONLY job is to analyze the contract according to the provided taxonomy and output STRICT JSON.
-        
-        You MUST return your response as a JSON object containing a single key named "findings", which is a list of risk objects.
-        
-        Each finding in the list MUST adhere to this exact schema:
-        {
-            "clause_ref": "Exact section or clause reference (e.g. 'Section 3.2')",
-            "quote": "Direct, verbatim quote from the contract text",
-            "category": "Must be one of: [payment_terms, kill_fee, liability_cap, ip_ownership, indemnification, other_risk]",
-            "severity": "Must be one of: [must_raise, worth_raising]",
-            "explanation": "Plain-English explanation of what this means for the freelancer",
-            "confidence": A number between 0.0 and 1.0 representing your confidence
-        }
-        
-        CRITICAL RULES:
-        1. If no risks are found, return {"findings": []}
-        2. Never output conversational text. Output ONLY valid JSON.
-        3. Every finding MUST include a direct quote from the text.
-        """
+You are ClauseGuard, an expert legal AI specializing in protecting freelancers from risky contract clauses.
+Your ONLY job is to analyze the contract text for risks and output STRICT, VALID JSON.
+
+You MUST return a JSON object with a single key "findings" containing a list of risk objects.
+Be THOROUGH and PROACTIVE — flag any clause that could disadvantage the freelancer, even if subtle.
+
+Categories to look for (flag ALL that apply):
+- payment_terms: Late payment, no payment schedule, vague milestones, client can withhold payment
+- kill_fee: No kill fee, or project can be cancelled without compensation
+- liability_cap: No cap on freelancer liability, or unlimited indemnification
+- ip_ownership: Client claims ownership of ALL work including pre-existing IP, tools, or background IP
+- indemnification: Freelancer must indemnify client for things outside their control
+- other_risk: Non-compete, non-solicitation, jurisdiction issues, unilateral contract modification
+
+Each finding MUST follow this EXACT JSON schema:
+{
+    "clause_ref": "The section number or heading (e.g. 'Section 3', 'Clause 5.2')",
+    "quote": "Copy the EXACT verbatim text from the contract — do not paraphrase",
+    "category": "one of: payment_terms, kill_fee, liability_cap, ip_ownership, indemnification, other_risk",
+    "severity": "one of: must_raise, worth_raising",
+    "explanation": "Plain-English explanation of why this is risky for the freelancer",
+    "confidence": 0.85
+}
+
+CRITICAL RULES:
+1. Output ONLY the JSON object — no preamble, no explanation text, no markdown code fences.
+2. The "quote" field MUST be copied verbatim from the contract text.
+3. If you genuinely find no risks, return {"findings": []}.
+4. A confidence of 0.0 means you have no confidence; 1.0 means absolute certainty.
+"""
 
         user_prompt = f"=== DOCUMENT DATA BEGIN ===\n{contract_text}\n=== DOCUMENT DATA END ==="
 
@@ -58,8 +69,9 @@ class StructuredAnalyzer:
             return json.loads(raw_content)
             
         except Exception as e:
-            print(f"Analyzer Error: {e}")
-            return {"findings": []}
+            print(f"[ANALYZER ERROR] {type(e).__name__}: {e}")
+            # Re-raise so the API surfaces the real error instead of silently returning no findings
+            raise RuntimeError(f"Analyzer failed: {e}") from e
 
 # --- Testing Code ---
 if __name__ == "__main__":

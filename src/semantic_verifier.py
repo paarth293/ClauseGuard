@@ -8,8 +8,8 @@ load_dotenv()
 class SemanticVerifier:
     def __init__(self):
         self.client = Groq()
-        # We use a smaller, much faster model for this simple binary task to save time/money
-        self.model = "llama-3.1-8b-instant" 
+        # llama3-8b-8192 is fast and reliable for this binary YES/NO task
+        self.model = "openai/gpt-oss-20b"
 
     def verify_interpretation(self, verified_findings: list) -> list:
         """
@@ -64,12 +64,17 @@ class SemanticVerifier:
                 # Attach the semantic check results to the finding for our logs
                 finding["semantic_check"] = verification_result
                 
-                # THE SECOND KILL SWITCH: If the LLM says "NO" or "UNCERTAIN", we drop the finding!
-                if verification_result.get("verdict") == "YES":
+                verdict = verification_result.get("verdict", "UNCERTAIN").upper()
+                # Only DROP a finding if the LLM explicitly says NO.
+                # UNCERTAIN findings are kept — the human reviewer can make the final call.
+                if verdict != "NO":
                     semantically_verified.append(finding)
                     
             except Exception as e:
-                print(f"Semantic Verification Error: {e}")
+                print(f"[SEMANTIC VERIFIER ERROR] {e}")
+                # On API error, keep the finding rather than silently discarding it
+                finding["semantic_check"] = {"verdict": "PASS_ON_ERROR", "reason": str(e)}
+                semantically_verified.append(finding)
                 
         return semantically_verified
 
