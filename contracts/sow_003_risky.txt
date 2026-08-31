@@ -1,0 +1,33 @@
+INDEPENDENT CONTRACTOR AGREEMENT
+
+This Independent Contractor Agreement ("Agreement") is entered into as of January 15, 2026, by and between TechCorp Inc. ("Client") and John Smith ("Contractor").
+
+1. SCOPE OF WORK
+Contractor shall provide web development services including front-end development, back-end API integration, and database design as described in Exhibit A. Contractor shall devote their full working time and attention to the performance of services under this Agreement.
+
+2. TERM
+This Agreement shall commence on January 15, 2026 and shall continue until the project is completed to the Client's sole and absolute satisfaction. The Client reserves the right to terminate this Agreement at any time, with or without cause, and with or without notice, upon written notice to the Contractor.
+
+3. COMPENSATION
+Client shall pay Contractor a total fixed fee of $15,000 for all services rendered under this Agreement. Payment shall be made within ninety (90) days of Client's receipt of a properly submitted invoice. Client reserves the right to withhold payment if, in its sole discretion, the delivered work does not meet Client's standards. No late payment penalties or interest shall apply.
+
+4. INTELLECTUAL PROPERTY
+All work product, deliverables, inventions, discoveries, improvements, ideas, concepts, designs, code, documentation, and any other materials or works of authorship created by Contractor in connection with this Agreement (collectively, "Work Product"), including all pre-existing intellectual property, background IP, tools, templates, frameworks, libraries, and open-source components used or incorporated into the Work Product, shall be the sole and exclusive property of the Client. Contractor hereby assigns all rights, title, and interest in and to the Work Product to the Client, including all copyrights, patent rights, trade secret rights, and any other intellectual property rights, in perpetuity, throughout the world, without any further compensation to Contractor.
+
+5. CONFIDENTIALITY
+Contractor agrees to maintain the confidentiality of all proprietary information of the Client and shall not disclose any such information to any third party without the prior written consent of the Client. This obligation shall survive the termination of this Agreement for a period of five (5) years.
+
+6. INDEMNIFICATION
+Contractor shall defend, indemnify, and hold harmless the Client, its officers, directors, employees, agents, successors, and assigns from and against any and all claims, damages, losses, liabilities, costs, and expenses (including reasonable attorneys' fees) arising out of or relating to: (a) any breach of this Agreement by Contractor; (b) any negligent or willful act or omission of Contractor; or (c) any claim that the Work Product infringes upon the intellectual property rights of any third party. This indemnification obligation shall be unlimited in amount and shall survive the termination of this Agreement.
+
+7. NON-COMPETE
+During the term of this Agreement and for a period of twenty-four (24) months following its termination or expiration, Contractor shall not, directly or indirectly, engage in, be employed by, consult for, or have any ownership interest in any business that competes with the Client's current or planned business activities. Contractor shall not solicit or attempt to solicit any client or customer of the Client during this period.
+
+8. NO EMPLOYEE BENEFITS
+Contractor acknowledges that they are an independent contractor and shall not be entitled to any benefits provided by the Client to its employees, including but not limited to health insurance, retirement benefits, paid time off, or workers' compensation insurance.
+
+9. GOVERNING LAW AND DISPUTE RESOLUTION
+This Agreement shall be governed by and construed in accordance with the laws of the State of Delaware, without regard to its conflict of laws principles. Any dispute arising under this Agreement shall be resolved exclusively in the federal or state courts located in Wilmington, Delaware.
+
+10. ENTIRE AGREEMENT
+This Agreement constitutes the entire agreement between the parties and supersedes all prior agreements, understandings, representations, and warranties, whether oral or written. No modification of this Agreement shall be effective unless made in writing and signed by both parties.

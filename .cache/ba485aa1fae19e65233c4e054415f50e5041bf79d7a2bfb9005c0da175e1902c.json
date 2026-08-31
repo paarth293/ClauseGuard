@@ -1,0 +1,148 @@
+{
+  "timestamp": 1788182754.3445122,
+  "data": {
+    "report": "\u2554\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2557\n\u2551  CLAUSEGUARD REVIEW                                  \u2551\n\u2551  Status: \u26a0\ufe0f ISSUES FOUND                             \u2551\n\u2551  Verified Findings: 3                                 \u2551\n\u255a\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u2550\u255d\n\n### Items to Raise\n\n- **payment_terms \u2013 Clause 4**  \n  > You will be paid a total stipend of\u202f\u20b917,500 (Rupees Seventeen Thousand Five Hundred only), disbursed in instalments tied to project milestones, in line with the payment schedule agreed with the client:  \n  > Milestone Description % of Stipend Amount  \n  > 1 Agreement signing / internship start 30%\u202f\u20b95,250  \n  > 2 Phase 3 complete \u2013 Booking system 20%\u202f\u20b93,500 ready  \n  > 3 Phase 5 complete \u2013 Live classes 30%\u202f\u20b95,250 working  \n  > 4 Final delivery and deployment 20%\u202f\u20b93,500  \n  > The stipend will be transferred via bank transfer / UPI to the account details provided by you. The stipend is inclusive of all applicable deductions, if any.  \n  **Explanation:** The payment schedule lacks specific dates, net\u2011payment terms, or penalties for late payment, leaving the intern vulnerable to delayed or withheld stipend. *Consider discussing the inclusion of clear payment dates, net terms (e.g., \u201cpayment within 30 days of invoice\u201d), and late\u2011payment remedies.*\n\n- **other_risk \u2013 Clause 7**  \n  > Either party may terminate this internship by providing 7 days' written notice. Language Metrics reserves the right to terminate this internship without notice in cases of misconduct, breach of confidentiality, or unsatisfactory performance.  \n  **Explanation:** The employer can terminate without notice, creating an imbalance and leaving the intern without compensation or recourse. *You may want to discuss adding a mutual notice period or specifying any severance or compensation due upon termination without notice.*\n\n- **kill_fee \u2013 Clause 14**  \n  > If this internship is terminated before completion under Clause 7, the stipend payable shall be limited to the milestone(s) actually achieved as of the date of termination, calculated in accordance with the payment schedule in Clause 4; no amount shall be payable for milestones not yet achieved.  \n  **Explanation:** There is no provision for a kill fee or compensation for work performed up to termination beyond the milestone payments, which can leave the intern unpaid for effort expended. *Consider discussing the inclusion of a proportional \u201ckill fee\u201d or a minimum compensation for work completed prior to termination.*\n\n---\n*\u26a0\ufe0f DISCLAIMER: ClauseGuard is an AI tool, not a lawyer. This report is for informational purposes to help you prepare for negotiations. It does not constitute legal advice.*",
+    "findings": [
+      {
+        "clause_ref": "Clause 4",
+        "quote": "You will be paid a total stipend of \u20b917,500 (Rupees Seventeen Thousand Five Hundred only), disbursed in instalments tied to project milestones, in line with the payment schedule agreed with the client:\nMilestone Description % of Stipend Amount\n1 Agreement signing / internship start 30% \u20b95,250\n2 Phase 3 complete \u2013 Booking system 20% \u20b93,500 ready\n3 Phase 5 complete \u2013 Live classes 30% \u20b95,250 working\n4 Final delivery and deployment 20% \u20b93,500\nThe stipend will be transferred via bank transfer / UPI to the account details provided by you. The stipend is inclusive of all applicable deductions, if any.",
+        "category": "payment_terms",
+        "severity": "worth_raising",
+        "explanation": "The payment schedule lacks specific dates, net\u2011payment terms, or penalties for late payment, leaving the intern vulnerable to delayed or withheld stipend.",
+        "confidence": 0.95
+      },
+      {
+        "clause_ref": "Clause 7",
+        "quote": "Either party may terminate this internship by providing 7 days' written notice. Language Metrics reserves the right to terminate this internship without notice in cases of misconduct, breach of confidentiality, or unsatisfactory performance.",
+        "category": "other_risk",
+        "severity": "must_raise",
+        "explanation": "The employer can terminate without notice, creating an imbalance and leaving the intern without compensation or recourse.",
+        "confidence": 0.95
+      },
+      {
+        "clause_ref": "Clause 14",
+        "quote": "If this internship is terminated before completion under Clause 7, the stipend payable shall be limited to the milestone(s) actually achieved as of the date of termination, calculated in accordance with the payment schedule in Clause 4; no amount shall be payable for milestones not yet achieved.",
+        "category": "kill_fee",
+        "severity": "must_raise",
+        "explanation": "There is no provision for a kill fee or compensation for work performed up to termination beyond the milestone payments, which can leave the intern unpaid for effort expended.",
+        "confidence": 0.9
+      }
+    ],
+    "score": 68,
+    "score_breakdown": {
+      "blended_score": 68,
+      "llm_score": 48,
+      "rule_score": 82,
+      "alpha": 0.6,
+      "blending_formula": "60% \u00d7 82 + 40% \u00d7 48 = 68",
+      "stability_band": "\u00b114 points",
+      "llm_breakdown": {
+        "total_penalty": 51.6,
+        "findings_count": 3,
+        "category_count": 3,
+        "diversity_multiplier": 1.2,
+        "per_finding_penalties": [
+          {
+            "category": "payment_terms",
+            "severity": "worth_raising",
+            "confidence": 0.95,
+            "semantic_verdict": "YES",
+            "base_penalty": 7,
+            "confidence_multiplier": 1.0,
+            "semantic_discount": 1.0,
+            "diminishing_factor": 1.0,
+            "final_penalty": 7.0
+          },
+          {
+            "category": "other_risk",
+            "severity": "must_raise",
+            "confidence": 0.95,
+            "semantic_verdict": "YES",
+            "base_penalty": 18,
+            "confidence_multiplier": 1.0,
+            "semantic_discount": 1.0,
+            "diminishing_factor": 1.0,
+            "final_penalty": 18.0
+          },
+          {
+            "category": "kill_fee",
+            "severity": "must_raise",
+            "confidence": 0.9,
+            "semantic_verdict": "YES",
+            "base_penalty": 18,
+            "confidence_multiplier": 1.0,
+            "semantic_discount": 1.0,
+            "diminishing_factor": 1.0,
+            "final_penalty": 18.0
+          }
+        ]
+      },
+      "rule_breakdown": {
+        "applied_rules": [
+          {
+            "rule": "no_kill_fee",
+            "deduction": 8,
+            "description": "No explicit kill fee for project cancellation",
+            "triggered": true
+          },
+          {
+            "rule": "no_liability_cap",
+            "deduction": 10,
+            "description": "No liability cap found (unlimited exposure)",
+            "triggered": true
+          }
+        ],
+        "total_deduction": 18,
+        "num_rules_triggered": 2
+      }
+    },
+    "contract_text": "LANGUAGE METRICS\nProprietor: Riyansh Kumar Gupta\nWard Number 26, Ram Dham Mandir, Near Shiv Mandir, Bagaha 1, Paschim Champaran, Bihar \u2013 845101\nUdyam Reg. No.: UDYAM-BR-38-0073569 | GSTIN: 10CZIPG4144C1Z2 | Email: languagemetrics@gmail.com | www.languagemetrics.in\nLetter No.: LM/INT/2026/01\nDate: August 21, 2026\nTo,\nPaarth Gupta\nAliganj Road, Gola Gokarannath, Kheri \u2013 262802\nB.Tech, Computer Science and Engineering, KIET Group of Institutions\nSUBJECT: OFFER OF INTERNSHIP \u2013 FULL STACK DEVELOPER INTERN\nDear Paarth,\nWe are pleased to offer you an internship with LANGUAGE METRICS for the role of Full Stack Developer Intern, in\nconnection with our language-learning platform project currently under development. This letter sets out the\nterms and conditions of your internship.\n1. Role and Responsibilities\n\uf0b7 Development and maintenance of the frontend UI/UX and user interface, along with the backend API using\nNode.js + Express, and the database using PostgreSQL / Supabase with Prisma ORM.\n\uf0b7 Integration of core platform features including authentication, booking system, payments through Razor pay,\nand the coin system.\n\uf0b7 Development of the Teacher and Admin web portals using React.\n\uf0b7 Integration of the live class system using relevant API and supporting backend infrastructure.\n\uf0b7 Collaboration with the AI Developer on API contracts and end-to-end feature delivery.\n2. Duration\n\uf0b7 This internship shall commence on the date on which the Intern signs and accepts this Internship Letter and\nshall continue for a period of exactly three (3) months from the date of such acceptance.\n\uf0b7 The duration may be adjusted by mutual written agreement based on project progress and requirements.\n3. Work Mode & Availability\n\uf0b7 The Internship shall be conducted on a fully remote basis. The Intern shall be expected to devote\napproximately thirty (30) hours per week to the duties and responsibilities assigned under this Internship. The\nIntern shall also be required to attend and actively participate in scheduled meetings, progress reviews,\ncheck-ins, stand-up meetings, and other work-related sessions as may be reasonably scheduled or\ncommunicated by the Proprietor from time to time.\n\uf0b7 The Intern shall report to Priyanshu Raj, Co-Founder & Technical Lead of Language Metrics, on a weekly\nbasis and provide updates on assigned tasks and responsibilities.\nWard Number 26, Ram Dham Mandir, Near Shiv Mandir, Bagaha 1, Paschim Champaran, Bihar \u2013 845101 | languagemetrics@gmail.com | www.languagemetrics.in\n4. Stipend\nYou will be paid a total stipend of \u20b917,500 (Rupees Seventeen Thousand Five Hundred only), disbursed in\ninstalments tied to project milestones, in line with the payment schedule agreed with the client:\nMilestone Description % of Stipend Amount\n1 Agreement signing / internship start 30% \u20b95,250\n2 Phase 3 complete \u2013 Booking system 20% \u20b93,500\nready\n3 Phase 5 complete \u2013 Live classes 30% \u20b95,250\nworking\n4 Final delivery and deployment 20% \u20b93,500\nThe stipend will be transferred via bank transfer / UPI to the account details provided by you. The stipend is\ninclusive of all applicable deductions, if any.\n5. Confidentiality\nDuring and after the internship, you agree to keep confidential all proprietary information, source code,\ncredentials, business processes, and client (Language Metrics) data that you access in the course of this\ninternship, and not to disclose or use such information for any purpose outside this engagement.\n6. Ownership of Work\nAll code, designs, documentation, and other work created by the Intern in connection with this Internship shall\nbe the exclusive property of Language Metrics. The Intern shall not claim ownership of, reproduce, distribute,\nor use such work for any personal or external purpose without prior written authorization from Language\nMetrics. The Intern agrees to assign any rights or interests they may have in such work to Language Metrics.\n7. Termination\nEither party may terminate this internship by providing 7 days' written notice. Language Metrics reserves the right\nto terminate this internship without notice in cases of misconduct, breach of confidentiality, or unsatisfactory\nperformance.\n8. Certificate of Completion\nOn successful completion of the internship, you will be issued a Certificate of Internship confirming your role,\nduration, and contributions to the project.\n9. Professional Conduct\nYou are expected to maintain professional conduct, comply with reasonable project instructions and security\npractices, protect company credentials and systems, and promptly communicate any material issue that may\naffect project delivery.\n10. Leave / Absence\nAny planned leave of absence should be communicated to the Proprietor in advance, so that project timelines\nand coverage can be planned accordingly.\n11. Company Property & Access\nAll company credentials, repositories, documents, API keys, and other resources provided to you for the\npurposes of this internship must be returned or, where applicable, have access revoked, at the end of the\ninternship.\nWard Number 26, Ram Dham Mandir, Near Shiv Mandir, Bagaha, Paschim Champaran, Bihar \u2013 845101 | languagemetrics@gmail.com | www.languagemetrics.in\n12. No Employment Relationship\nThis internship is a temporary engagement for the duration stated above and does not constitute, and shall not\nbe construed as creating, an employer-employee relationship or any right to permanent employment with\nLanguage Metrics, whether during or upon completion of the internship.\n13. Point of Contact & Grievance Redressal\nFor day-to-day project matters, your primary point of contact is Priyanshu Raj, Co-Founder & Technical Lead.\nAny concerns or grievances that remain unresolved after being raised with Priyanshu Raj may be escalated to the\nProprietor.\n14. Stipend on Early Termination\nIf this internship is terminated before completion under Clause 7, the stipend payable shall be limited to the\nmilestone(s) actually achieved as of the date of termination, calculated in accordance with the payment schedule\nin Clause 4; no amount shall be payable for milestones not yet achieved.\n15. Entire Agreement & Amendment\nThis letter constitutes the entire agreement between the parties with respect to the internship and supersedes\nany prior discussions or understandings, whether written or oral. No amendment or modification shall be valid\nunless made in writing and signed by both parties.\n16. Governing Law & Jurisdiction\nThis letter shall be governed by and construed in accordance with the laws of India, and the courts at Bagaha,\nWest Champaran, Bihar shall have exclusive jurisdiction over any disputes arising out of or in connection with\nthis internship.\n17. Acceptance\nPlease sign and return a copy of this letter as a token of your acceptance of the above terms and conditions.\nFor LANGUAGE METRICS,\n___________________________\nRIYANSH KUMAR GUPTA\nProprietor, Language Metrics\nACCEPTANCE BY INTERN\nI, Paarth Gupta, hereby accept the terms and conditions of this internship offer and agree to comply with the\nresponsibilities and obligations stated in this letter.\nSignature: ____________________________ Date: __________________\nWard Number 26, Ram Dham Mandir, Near Shiv Mandir, Bagaha, Paschim Champaran, Bihar \u2013 845101 | languagemetrics@gmail.com | www.languagemetrics.in",
+    "metrics": {
+      "total_elapsed_seconds": 165.616,
+      "final_score": 68,
+      "final_findings": 3,
+      "steps": [
+        {
+          "step": "Ingestion",
+          "elapsed_seconds": 1.22,
+          "finding_count": null
+        },
+        {
+          "step": "Cache Check",
+          "elapsed_seconds": 0.001,
+          "finding_count": null
+        },
+        {
+          "step": "Consensus Analysis",
+          "elapsed_seconds": 8.539,
+          "finding_count": 7
+        },
+        {
+          "step": "Deduplication",
+          "elapsed_seconds": 0.001,
+          "finding_count": 7
+        },
+        {
+          "step": "Verification",
+          "elapsed_seconds": 0.006,
+          "finding_count": 7
+        },
+        {
+          "step": "Semantic Check",
+          "elapsed_seconds": 144.142,
+          "finding_count": 3
+        },
+        {
+          "step": "Synthesis",
+          "elapsed_seconds": 11.683,
+          "finding_count": null
+        },
+        {
+          "step": "Blended Score",
+          "elapsed_seconds": 0.009,
+          "finding_count": null
+        }
+      ]
+    }
+  }
+}

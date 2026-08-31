@@ -1,13 +1,13 @@
 import json
 from dotenv import load_dotenv
-from groq import AsyncGroq
+from .llm import get_openai_client, get_model
 
 load_dotenv()
 
 class ReportSynthesizer:
     def __init__(self):
-        self.client = AsyncGroq()
-        self.model = "openai/gpt-oss-120b"
+        self.client = get_openai_client()
+        self.model = get_model("synthesis")  # gpt-4o
 
     async def generate_report(self, verified_findings: list) -> str:
         """

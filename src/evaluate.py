@@ -1,9 +1,11 @@
 import os
+import asyncio
 import pandas as pd
 from .ingestion import IngestionPipeline
 from .analyzer import StructuredAnalyzer
 from .verifier import DeterministicVerifier
 from .semantic_verifier import SemanticVerifier
+from .deduplicator import FindingsDeduplicator
 
 def run_evaluation():
     print("Starting ClauseGuard Evaluation Protocol...")
@@ -27,11 +29,12 @@ def run_evaluation():
             print(f"  Skipping: File not found ({contract})")
             continue
             
-        # Run the AI pipeline silently (no print statements)
+        # Run the AI pipeline (with proper async handling)
         parsed_text = IngestionPipeline().process(file_path)["parsed_text"]
-        raw_findings = StructuredAnalyzer().analyze(parsed_text).get("findings", [])
-        det_verified = DeterministicVerifier().verify(raw_findings, parsed_text)
-        final_findings = SemanticVerifier().verify_interpretation(det_verified)
+        raw_findings = asyncio.run(StructuredAnalyzer().analyze(parsed_text)).get("findings", [])
+        deduped = FindingsDeduplicator().deduplicate(raw_findings)
+        det_verified = DeterministicVerifier().verify(deduped, parsed_text)
+        final_findings = asyncio.run(SemanticVerifier().verify_interpretation(det_verified, contract_text=parsed_text))
         
         # What risks did the CSV say we should find?
         expected_categories = df[df['contract_id'] == contract]['risk_type'].tolist()

@@ -1,13 +1,14 @@
-from groq import AsyncGroq
-import os
-from dotenv import load_dotenv
+"""
+Contract Chatbot — Uses GPT-4o-mini for fast Q&A over contract text.
+"""
 
-load_dotenv()
+from .llm import get_openai_client, get_model
+
 
 class ContractChatbot:
     def __init__(self):
-        self.client = AsyncGroq()
-        self.model = "openai/gpt-oss-120b"
+        self.client = get_openai_client()
+        self.model = get_model("chat")  # gpt-4o-mini
 
     async def answer_question(self, contract_text: str, question: str) -> str:
         """
@@ -25,12 +26,12 @@ class ContractChatbot:
         """
         
         user_prompt = f"""
-        === CONTRACT TEXT ===
-        {contract_text}
-        =====================
-        
-        User Question: {question}
-        """
+=== CONTRACT TEXT ===
+{contract_text}
+=====================
+
+User Question: {question}
+"""
         
         try:
             response = await self.client.chat.completions.create(

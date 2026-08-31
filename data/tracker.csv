@@ -1,2 +1,9 @@
 contract_id,clause_ref,risk_type,severity,description
 sow_002_seeded.txt,Section 3,ip_ownership,must_raise,IP assignment scope intentionally includes freelancer's past work and background IP.
+sow_003_risky.txt,Section 2,kill_fee,must_raise,Client can terminate at any time without cause and without compensation to contractor. No kill fee.
+sow_003_risky.txt,Section 3,payment_terms,must_raise,Net-90 payment terms are excessive. Client can withhold payment at sole discretion with no late payment penalty.
+sow_003_risky.txt,Section 4,ip_ownership,must_raise,Blanket IP assignment includes all pre-existing IP, background IP, tools, frameworks, libraries, and open-source components. Contractor loses all rights to their own work.
+sow_003_risky.txt,Section 6,indemnification,must_raise,Unlimited indemnification obligation. One-sided: only contractor indemnifies client, no mutual indemnification.
+sow_003_risky.txt,Section 7,other_risk,must_raise,24-month non-compete and non-solicitation clause is overly restrictive for a freelance engagement.
+sow_003_risky.txt,Missing: Liability cap,liability_cap,must_raise,Contract has no aggregate liability cap. Contractor has unlimited exposure.
+sow_003_risky.txt,Section 3,payment_terms,worth_raising,Payment is lump-sum only with no milestone-based payment schedule. No progress payments.

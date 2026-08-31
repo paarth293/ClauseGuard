@@ -1,65 +1,91 @@
 import re
+from typing import Optional
+
+
+# ── Configuration ────────────────────────────────────────────────────────────
+
+REQUIRED_FIELDS = ["clause_ref", "quote", "category", "severity", "explanation", "confidence"]
+VALID_SEVERITIES = {"must_raise", "worth_raising"}
+VALID_CATEGORIES = {
+    "payment_terms", "kill_fee", "liability_cap",
+    "ip_ownership", "indemnification", "other_risk"
+}
+MIN_CONFIDENCE = 0.5
+MIN_GROUNDING_OVERLAP = 0.60  # 60% word overlap if exact match fails
+
 
 class DeterministicVerifier:
-    def verify(self, findings: list, source_text: str) -> list:
-        """
-        Takes a list of JSON findings and verifies them deterministically.
-        Returns a list containing ONLY the findings that passed the checks.
-        """
+    """
+    Filters LLM findings through deterministic checks.
+    Only findings that pass ALL checks are returned.
+    """
+
+    def verify(self, findings: list[dict], source_text: str) -> list[dict]:
         verified_findings = []
         normalized_source = self._normalize(source_text)
         
         for finding in findings:
             checks = {}
-            
-            # 1. Schema Completeness Check
-            required_fields = ["clause_ref", "quote", "category", "severity", "explanation", "confidence"]
-            missing = [f for f in required_fields if f not in finding or finding[f] is None or str(finding[f]).strip() == ""]
-            checks["schema_valid"] = "PASS" if not missing else f"FAIL (Missing: {missing})"
-            
-            # 2. Grounding Check – the quote must be substantially present in the source text.
-            # We use TWO strategies so minor LLM paraphrasing doesn't kill real findings:
-            #   (a) Exact normalised substring match  – catches verbatim quotes
-            #   (b) Word-overlap ratio ≥ 60%          – catches lightly reworded quotes
+
+            # ── Check 1: Schema Completeness ──────────────────────────────
+            missing = [
+                f for f in REQUIRED_FIELDS
+                if f not in finding or finding[f] is None or str(finding[f]).strip() == ""
+            ]
+            checks["schema_valid"] = "PASS" if not missing else f"FAIL (missing: {missing})"
+
+            # ── Check 2: Category / Severity Validity ─────────────────────
+            category = finding.get("category", "")
+            severity = finding.get("severity", "")
+            cat_ok = category in VALID_CATEGORIES
+            sev_ok = severity in VALID_SEVERITIES
+            checks["values_valid"] = (
+                "PASS" if (cat_ok and sev_ok)
+                else f"FAIL (category={category} valid={cat_ok}, severity={severity} valid={sev_ok})"
+            )
+
+            # ── Check 3: Grounding ────────────────────────────────────────
             quote = finding.get("quote", "")
             if quote:
                 normalized_quote = self._normalize(quote)
-                
-                # Strategy (a): direct substring
+                # Strategy A: direct substring match
                 if normalized_quote in normalized_source:
                     checks["grounding"] = "PASS"
                 else:
-                    # Strategy (b): word-overlap ratio
+                    # Strategy B: word-overlap ratio
                     overlap = self._word_overlap(normalized_quote, normalized_source)
-                    if overlap >= 0.60:
-                        checks["grounding"] = "PASS"
+                    if overlap >= MIN_GROUNDING_OVERLAP:
+                        checks["grounding"] = f"PASS (overlap={overlap:.0%})"
                     else:
-                        checks["grounding"] = f"FAIL (Quote not found; overlap={overlap:.0%})"
+                        checks["grounding"] = f"FAIL (quote not found; overlap={overlap:.0%})"
             else:
-                checks["grounding"] = "FAIL (No quote provided by AI)"
-                
-            # 3. Confidence Check
+                checks["grounding"] = "FAIL (no quote provided)"
+
+            # ── Check 4: Confidence Threshold ─────────────────────────────
             confidence = finding.get("confidence", 0.0)
             try:
                 conf_val = float(confidence)
             except (TypeError, ValueError):
                 conf_val = 0.0
-            checks["confidence"] = "PASS" if conf_val >= 0.5 else f"FAIL (Low confidence: {confidence})"
-                
-            # Attach the test results to the finding for transparency
+            checks["confidence"] = (
+                "PASS" if conf_val >= MIN_CONFIDENCE
+                else f"FAIL (confidence={conf_val:.2f} < {MIN_CONFIDENCE})"
+            )
+
+            # ── Attach verification results for audit trail ───────────────
             finding["verification_checks"] = checks
-            
-            # THE KILL SWITCH: Only drop if grounding explicitly fails
-            if checks["grounding"] == "PASS":
+
+            # ── KILL SWITCH: ALL checks must pass ─────────────────────────
+            all_passed = all(v == "PASS" or v.startswith("PASS ") for v in checks.values())
+            if all_passed:
                 verified_findings.append(finding)
                 
         return verified_findings
 
+    # ── Helpers ───────────────────────────────────────────────────────────
+
     def _word_overlap(self, quote: str, source: str) -> float:
-        """
-        Computes the fraction of unique words in the quote that appear in the source.
-        This catches cases where the LLM slightly paraphrases the verbatim text.
-        """
+        """Fraction of unique words in the quote that appear in the source."""
         quote_words = set(quote.split())
         if not quote_words:
             return 0.0
@@ -67,10 +93,7 @@ class DeterministicVerifier:
         return matches / len(quote_words)
 
     def _normalize(self, text: str) -> str:
-        """
-        Normalizes text for comparison by lowercasing and collapsing extra spaces.
-        This prevents false failures caused by weird line-breaks in PDFs.
-        """
+        """Lowercase and collapse whitespace for stable comparison."""
         if not text:
             return ""
         text = text.lower()
@@ -78,32 +101,31 @@ class DeterministicVerifier:
         return text.strip()
 
 
-# --- Testing Code ---
+# ── Standalone Test ──────────────────────────────────────────────────────────
+
 if __name__ == "__main__":
     import os
     import json
+    import asyncio
     from .ingestion import IngestionPipeline
     from .analyzer import StructuredAnalyzer
-    
+
     print("1. Ingesting...")
     ingestion = IngestionPipeline()
     test_path = os.path.join(os.path.dirname(__file__), "../contracts/sow_002_seeded.txt")
     ingest_result = ingestion.process(test_path)
-    
-    print("2. Analyzing (This might take a second)...")
+
+    print("2. Analyzing...")
     analyzer = StructuredAnalyzer()
-    analyzer_result = analyzer.analyze(ingest_result["parsed_text"])
-    
+    analyzer_result = asyncio.run(analyzer.analyze(ingest_result["parsed_text"]))
+
     print("3. Verifying deterministically...")
     verifier = DeterministicVerifier()
-    
-    # We pass BOTH the AI's findings AND the original pure text to the verifier
     verified = verifier.verify(analyzer_result.get("findings", []), ingest_result["parsed_text"])
-    
-    print("\n" + "="*50)
+
+    print("\n" + "=" * 50)
     print("VERIFICATION RESULTS:")
-    print("="*50)
+    print("=" * 50)
     print(json.dumps(verified, indent=4))
-    
     print(f"\nOriginal AI findings: {len(analyzer_result.get('findings', []))}")
     print(f"Verified findings that survived: {len(verified)}")

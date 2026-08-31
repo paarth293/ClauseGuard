@@ -1,16 +1,22 @@
 import os
 import json
+import asyncio
 from dotenv import load_dotenv
-from groq import AsyncGroq
+from .llm import get_openai_client, get_model
 from .ingestion import IngestionPipeline
 
 load_dotenv()
 
+# ── Configuration ────────────────────────────────────────────────────────────
+
+MAX_RETRIES = 3
+RETRY_DELAY_SECONDS = 2.0
+
+
 class StructuredAnalyzer:
     def __init__(self):
-        self.client = AsyncGroq()
-        # llama3-70b-8192 is the most reliable Groq model for strict JSON output
-        self.model = "openai/gpt-oss-120b"
+        self.client = get_openai_client()
+        self.model = get_model("analysis")  # gpt-4o
 
     async def analyze(self, contract_text: str) -> dict:
         """
@@ -26,18 +32,22 @@ Your ONLY job is to analyze the contract text for risks and output STRICT, VALID
 You MUST return a JSON object with a single key "findings" containing a list of risk objects.
 Be THOROUGH and PROACTIVE — flag any clause that could disadvantage the freelancer, even if subtle.
 
+IMPORTANT: You must find risks in TWO ways:
+1. EXISTING bad clauses — find clauses that are unfair, one-sided, or dangerous to the freelancer
+2. MISSING standard protections — find when the contract OMITS protections that a fair contract should include
+
 Categories to look for (flag ALL that apply):
-- payment_terms: Late payment, no payment schedule, vague milestones, client can withhold payment
-- kill_fee: No kill fee, or project can be cancelled without compensation
-- liability_cap: No cap on freelancer liability, or unlimited indemnification
-- ip_ownership: Client claims ownership of ALL work including pre-existing IP, tools, or background IP
-- indemnification: Freelancer must indemnify client for things outside their control
-- other_risk: Non-compete, non-solicitation, jurisdiction issues, unilateral contract modification
+- payment_terms: Late payment (Net-30+), no payment schedule, no milestone payments, vague payment terms, client can withhold/delay payment, no late payment penalty
+- kill_fee: No kill fee clause, or project can be cancelled without compensation to the freelancer
+- liability_cap: No cap on freelancer liability, unlimited liability exposure, missing aggregate liability limit
+- ip_ownership: Client claims ownership of ALL work including pre-existing IP, background IP, tools, or open-source; blanket IP assignment; freelancer loses rights to their own prior work
+- indemnification: Freelancer must indemnify client for things outside their control; one-sided indemnification; no mutual indemnification
+- other_risk: Non-compete, non-solicitation, jurisdiction issues, unilateral contract modification, no governing law, no dispute resolution, no force majeure, no confidentiality boundaries, excessive exclusivity
 
 Each finding MUST follow this EXACT JSON schema:
 {
-    "clause_ref": "The section number or heading (e.g. 'Section 3', 'Clause 5.2')",
-    "quote": "Copy the EXACT verbatim text from the contract — do not paraphrase",
+    "clause_ref": "The section number or heading (e.g. 'Section 3', 'Clause 5.2'). For MISSING clauses, use 'Missing: [clause name]' (e.g. 'Missing: Termination clause')",
+    "quote": "Copy the EXACT verbatim text from the contract that demonstrates the risk. For MISSING clauses, quote the most relevant surrounding text that shows the gap.",
     "category": "one of: payment_terms, kill_fee, liability_cap, ip_ownership, indemnification, other_risk",
     "severity": "one of: must_raise, worth_raising",
     "explanation": "Plain-English explanation of why this is risky for the freelancer",
@@ -49,29 +59,60 @@ CRITICAL RULES:
 2. The "quote" field MUST be copied verbatim from the contract text.
 3. If you genuinely find no risks, return {"findings": []}.
 4. A confidence of 0.0 means you have no confidence; 1.0 means absolute certainty.
+5. MISSING clauses are just as dangerous as bad clauses — always flag them.
+6. Flag EVERYTHING — it is better to over-flag than to miss a risk.
 """
 
         user_prompt = f"=== DOCUMENT DATA BEGIN ===\n{contract_text}\n=== DOCUMENT DATA END ==="
 
-        try:
-            response = await self.client.chat.completions.create(
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                model=self.model,
-                temperature=0.1, # Extremely low temperature to ensure strict formatting
-                response_format={"type": "json_object"} # Forces the API to output valid JSON
-            )
-            
-            # Convert the string response into an actual Python dictionary
-            raw_content = response.choices[0].message.content
-            return json.loads(raw_content)
-            
-        except Exception as e:
-            print(f"[ANALYZER ERROR] {type(e).__name__}: {e}")
-            # Re-raise so the API surfaces the real error instead of silently returning no findings
-            raise RuntimeError(f"Analyzer failed: {e}") from e
+        last_error = None
+        for attempt in range(1, MAX_RETRIES + 1):
+            try:
+                response = await self.client.chat.completions.create(
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    model=self.model,
+                    temperature=0.0
+                )
+
+                raw_content = response.choices[0].message.content
+                print(f"[DEBUG] Raw LLM Output: {raw_content}")
+
+                # Clean markdown backticks if model didn't use response_format correctly
+                cleaned_content = raw_content.strip()
+                if cleaned_content.startswith("```json"):
+                    cleaned_content = cleaned_content[7:]
+                if cleaned_content.startswith("```"):
+                    cleaned_content = cleaned_content[3:]
+                if cleaned_content.endswith("```"):
+                    cleaned_content = cleaned_content[:-3]
+                cleaned_content = cleaned_content.strip()
+
+                try:
+                    result = json.loads(cleaned_content)
+                except json.JSONDecodeError as e:
+                    print(f"[DEBUG] JSON Decode Error: {e}")
+                    raise
+
+                # Validate that the response has the expected structure
+                if "findings" not in result:
+                    print(f"[DEBUG] 'findings' key missing. Result was: {result}")
+                    result = {"findings": []}
+
+                return result
+
+            except Exception as e:
+                last_error = e
+                print(f"[ANALYZER] Attempt {attempt}/{MAX_RETRIES} failed: {type(e).__name__}: {e}")
+                if attempt < MAX_RETRIES:
+                    delay = RETRY_DELAY_SECONDS * attempt  # Linear backoff
+                    print(f"[ANALYZER] Retrying in {delay:.1f}s...")
+                    await asyncio.sleep(delay)
+
+        # All retries exhausted
+        raise RuntimeError(f"Analyzer failed after {MAX_RETRIES} attempts: {last_error}")
 
 # --- Testing Code ---
 if __name__ == "__main__":
