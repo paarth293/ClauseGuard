@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle, Sparkles, Copy, Check, MessageSquare, X, Send } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle, Sparkles, Copy, Check, MessageSquare, X, Send, Download } from 'lucide-react';
 
 export interface Finding {
   clause_ref: string;
@@ -213,7 +213,7 @@ export default function Home() {
     <main className="min-h-screen bg-[#0f172a] text-slate-50 overflow-hidden relative selection:bg-blue-500/30">
       
       {/* Dynamic Background Elements */}
-      <div className="fixed inset-0 z-0 pointer-events-none">
+      <div className="fixed inset-0 z-0 pointer-events-none print:hidden">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px] mix-blend-screen animate-pulse-glow" style={{ animationDuration: '4s' }}></div>
         <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/20 blur-[120px] mix-blend-screen animate-pulse-glow" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
       </div>
@@ -225,7 +225,7 @@ export default function Home() {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-16 w-full"
+          className="text-center mb-16 w-full print:hidden"
         >
           <div className="inline-flex items-center justify-center space-x-3 mb-6 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 px-5 py-2 rounded-full shadow-lg">
             <ShieldCheck className="w-6 h-6 text-blue-400" />
@@ -249,7 +249,7 @@ export default function Home() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full mb-10"
+            className="w-full mb-10 print:hidden"
           >
             <div 
               className={`glass-panel rounded-2xl p-8 transition-all duration-300 border-2 ${
@@ -370,11 +370,20 @@ export default function Home() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, type: "spring" }}
-                className="w-full mb-20"
+                className="w-full mb-20 print:m-0"
               >
-                <div className="flex items-center space-x-2 mb-6 ml-2">
-                  <CheckCircle className="w-6 h-6 text-green-400" />
-                  <h2 className="text-2xl font-bold">Analysis Complete</h2>
+                <div className="flex items-center justify-between mb-6 ml-2 print:hidden">
+                  <div className="flex items-center space-x-2">
+                    <CheckCircle className="w-6 h-6 text-green-400" />
+                    <h2 className="text-2xl font-bold">Analysis Complete</h2>
+                  </div>
+                  <button 
+                    onClick={() => window.print()}
+                    className="flex items-center space-x-2 px-4 py-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition-colors border border-slate-700 hover:border-slate-600"
+                  >
+                    <Download className="w-4 h-4" />
+                    <span>Download PDF</span>
+                  </button>
                 </div>
 
                 {/* Risk Score Component */}
@@ -470,13 +479,13 @@ export default function Home() {
                         
                         <div>
                           <h4 className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">Risk Explanation</h4>
-                          <p className="text-slate-200 leading-relaxed text-sm mb-4">{finding.explanation}</p>
+                          <p className="text-slate-200 leading-relaxed text-sm mb-4 print:text-black">{finding.explanation}</p>
                           
                           {!safeClauses[idx] && (
                             <button
                               onClick={() => handleGenerateAlternative(idx, finding)}
                               disabled={loadingAlternatives[idx]}
-                              className="inline-flex items-center px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 text-sm font-medium rounded-lg transition-colors border border-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                              className="inline-flex items-center px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 text-sm font-medium rounded-lg transition-colors border border-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed print:hidden"
                             >
                               {loadingAlternatives[idx] ? (
                                 <Loader2 className="w-4 h-4 mr-2 animate-spin" />
@@ -500,13 +509,13 @@ export default function Home() {
                                 </h4>
                                 <button 
                                   onClick={() => handleCopy(idx, safeClauses[idx])}
-                                  className="text-slate-400 hover:text-white transition-colors"
+                                  className="text-slate-400 hover:text-white transition-colors print:hidden"
                                   title="Copy to clipboard"
                                 >
                                   {copiedIdx === idx ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
                                 </button>
                               </div>
-                              <p className="text-sm text-slate-200 font-serif leading-relaxed whitespace-pre-wrap">
+                              <p className="text-sm text-slate-200 font-serif leading-relaxed whitespace-pre-wrap print:text-black">
                                 {safeClauses[idx]}
                               </p>
                             </motion.div>
@@ -536,7 +545,7 @@ export default function Home() {
           <motion.div 
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            className="fixed bottom-6 right-6 z-50 flex flex-col items-end"
+            className="fixed bottom-6 right-6 z-50 flex flex-col items-end print:hidden"
           >
             {/* Chat Window */}
             <AnimatePresence>
