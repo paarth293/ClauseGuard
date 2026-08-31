@@ -3,6 +3,7 @@ import tempfile
 import asyncio
 from fastapi import FastAPI, UploadFile, File
 import uvicorn
+from pydantic import BaseModel
 from fastapi.middleware.cors import CORSMiddleware
 
 # Import our ClauseGuard pipeline modules
@@ -12,6 +13,7 @@ from .verifier import DeterministicVerifier
 from .semantic_verifier import SemanticVerifier
 from .synthesizer import ReportSynthesizer
 from .scorer import RiskScorer
+from .generator import ClauseGenerator
 
 app = FastAPI(title="ClauseGuard API")
 
@@ -23,6 +25,11 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class GenerateAlternativeRequest(BaseModel):
+    risky_clause: str
+    category: str
+    explanation: str
 
 @app.get("/")
 async def root():
@@ -84,6 +91,22 @@ async def analyze_contract(file: UploadFile = File(...)):
         # 3. Clean up (delete the temporary file from the server)
         if os.path.exists(temp_path):
             os.remove(temp_path)
+
+@app.post("/generate-alternative")
+async def generate_alternative(request: GenerateAlternativeRequest):
+    """
+    Receives a risky clause and generates a freelancer-friendly alternative.
+    """
+    print(f"\n--- Generating Alternative for category: {request.category} ---")
+    
+    generator = ClauseGenerator()
+    safe_clause = await generator.generate_alternative(
+        request.risky_clause, 
+        request.category, 
+        request.explanation
+    )
+    
+    return {"safe_clause": safe_clause}
 
 if __name__ == "__main__":
     # Start the server on port 8000
