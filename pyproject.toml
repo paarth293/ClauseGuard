@@ -1,27 +1,24 @@
-[tool.poetry]
+[project]
 name = "clauseguard"
 version = "0.1.0"
 description = "Enterprise-grade contract analysis AI with zero-hallucination pipeline"
-authors = [{"name" = "Paarth Sharma", "email" = ""}]
-license = "MIT"
-readme = "README.md"
-
-[tool.poetry.dependencies]
-python = ">=3.10,<4.0"
-fastapi = "^0.115.0"
-uvicorn = { extras = ["standard"], version = "^0.30.0" }
-openai = "^1.0.0"
-httpx = "^0.27.0"
-pydantic = "^2.0"
-python-dotenv = "^1.0.0"
-groq = "*"
-python-multipart = "*"
-pdfplumber = "*"
-python-docx = "*"
+requires-python = ">=3.10"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.30.0",
+    "openai>=1.0.0",
+    "httpx>=0.27.0",
+    "pydantic>=2.0",
+    "python-dotenv>=1.0.0",
+    "groq",
+    "python-multipart",
+    "pdfplumber",
+    "python-docx"
+]
 
 [build-system]
-requires = ["poetry-core>=1.0"]
-build-backend = "poetry.core.masonry.api"
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
 
 [tool.vercel]
 entrypoint = "src.api:app"
