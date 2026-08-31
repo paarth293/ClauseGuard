@@ -65,9 +65,12 @@ async def analyze_contract(file: UploadFile = File(...)):
         print("Synthesizing Report...")
         final_report = await ReportSynthesizer().generate_report(sem_verified)
         
-        # Return the final report as JSON to Next.js
+        # Return the final report and the structured findings as JSON to Next.js
         print("Success! Sending report back to frontend.")
-        return {"report": final_report}
+        return {
+            "report": final_report,
+            "findings": sem_verified
+        }
         
     except Exception as e:
         return {"error": str(e)}
