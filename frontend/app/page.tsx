@@ -5,10 +5,21 @@ import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight } from 'lucide-react';
 
+export interface Finding {
+  clause_ref: string;
+  quote: string;
+  category: string;
+  severity: string;
+  explanation: string;
+  confidence: number;
+}
+
 export default function Home() {
   const [file, setFile] = useState<File | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [report, setReport] = useState<string | null>(null);
+  const [findings, setFindings] = useState<Finding[] | null>(null);
+  const [score, setScore] = useState<number | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -50,7 +61,9 @@ export default function Home() {
   const handleFileSelection = (selectedFile: File) => {
     setFile(selectedFile);
     setError(null);
-    setReport(null); // Clear previous report when new file is selected
+    setReport(null);
+    setFindings(null);
+    setScore(null);
   };
 
   const onButtonClick = () => {
@@ -66,6 +79,8 @@ export default function Home() {
     setIsLoading(true);
     setError(null);
     setReport(null);
+    setFindings(null);
+    setScore(null);
 
     const formData = new FormData();
     formData.append('file', file);
@@ -84,6 +99,8 @@ export default function Home() {
       
       if (data.report) {
         setReport(data.report);
+        if (data.findings) setFindings(data.findings);
+        if (data.score !== undefined) setScore(data.score);
       } else {
         throw new Error("Invalid response format from server.");
       }
