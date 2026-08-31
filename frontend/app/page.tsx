@@ -328,14 +328,52 @@ export default function Home() {
                   </motion.div>
                 )}
                 
-                <div className="glass-panel rounded-2xl p-6 md:p-10 border-t-4 border-t-blue-500 relative overflow-hidden">
-                  {/* Decorative background element for the report card */}
-                  <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
-                  
-                  <div className="markdown-content relative z-10">
-                    <ReactMarkdown>{report}</ReactMarkdown>
+                {/* Findings UI Cards */}
+                {findings && findings.length > 0 ? (
+                  <div className="space-y-6">
+                    <h3 className="text-xl font-bold mb-4 flex items-center">
+                      <AlertCircle className="w-5 h-5 mr-2 text-blue-400" />
+                      Detailed Findings ({findings.length})
+                    </h3>
+                    
+                    {findings.map((finding, idx) => (
+                      <motion.div 
+                        key={idx}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.4, delay: 0.1 * idx }}
+                        className="glass-panel rounded-xl p-6 border-l-4 border-slate-600 hover:border-blue-500 transition-colors"
+                      >
+                        <div className="flex justify-between items-start mb-4">
+                          <div className="flex items-center space-x-3">
+                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-slate-800 text-slate-300 border border-slate-700 uppercase tracking-wider">
+                              {finding.category.replace('_', ' ')}
+                            </span>
+                            <span className="text-sm text-slate-400 font-medium">
+                              Ref: {finding.clause_ref}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        <div className="bg-slate-900/50 rounded-lg p-4 mb-4 border border-slate-800/80">
+                          <p className="text-slate-300 italic font-serif text-sm">"{finding.quote}"</p>
+                        </div>
+                        
+                        <div>
+                          <h4 className="text-sm font-semibold text-slate-400 mb-1 uppercase tracking-wide">Risk Explanation</h4>
+                          <p className="text-slate-200 leading-relaxed">{finding.explanation}</p>
+                        </div>
+                      </motion.div>
+                    ))}
                   </div>
-                </div>
+                ) : (
+                  <div className="glass-panel rounded-2xl p-6 md:p-10 border-t-4 border-t-blue-500 relative overflow-hidden">
+                    <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500/5 rounded-full blur-[80px] -translate-y-1/2 translate-x-1/4 pointer-events-none"></div>
+                    <div className="markdown-content relative z-10">
+                      {report ? <ReactMarkdown>{report}</ReactMarkdown> : <p>No risks identified!</p>}
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
           </AnimatePresence>
