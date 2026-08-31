@@ -10,6 +10,7 @@ from .analyzer import StructuredAnalyzer
 from .verifier import DeterministicVerifier
 from .semantic_verifier import SemanticVerifier
 from .synthesizer import ReportSynthesizer
+from .scorer import RiskScorer
 
 async def run_clauseguard(file_path: str):
     """Runs the complete end-to-end pipeline."""
@@ -47,8 +48,11 @@ async def run_clauseguard(file_path: str):
     print("[5/5] Synthesizing final report...\n")
     final_report = await ReportSynthesizer().generate_report(sem_verified)
     
+    score = RiskScorer().calculate_score(sem_verified)
+    
     print("=" * 60)
     print(" FINAL CLAUSEGUARD REPORT")
+    print(f" SAFETY SCORE: {score}/100")
     print("=" * 60)
     print(final_report)
     

@@ -11,6 +11,7 @@ from .analyzer import StructuredAnalyzer
 from .verifier import DeterministicVerifier
 from .semantic_verifier import SemanticVerifier
 from .synthesizer import ReportSynthesizer
+from .scorer import RiskScorer
 
 app = FastAPI(title="ClauseGuard API")
 
@@ -65,11 +66,15 @@ async def analyze_contract(file: UploadFile = File(...)):
         print("Synthesizing Report...")
         final_report = await ReportSynthesizer().generate_report(sem_verified)
         
+        print("Calculating Risk Score...")
+        score = RiskScorer().calculate_score(sem_verified)
+        
         # Return the final report and the structured findings as JSON to Next.js
         print("Success! Sending report back to frontend.")
         return {
             "report": final_report,
-            "findings": sem_verified
+            "findings": sem_verified,
+            "score": score
         }
         
     except Exception as e:
