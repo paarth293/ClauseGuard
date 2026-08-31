@@ -574,7 +574,9 @@ export default function Home() {
                         <div className={`max-w-[85%] rounded-xl p-3 text-sm leading-relaxed ${
                           msg.role === 'user' ? 'bg-blue-600 text-white rounded-br-none' : 'bg-slate-800 text-slate-200 border border-slate-700 rounded-bl-none'
                         }`}>
-                          <ReactMarkdown className="prose prose-invert prose-sm max-w-none">{msg.content}</ReactMarkdown>
+                          <div className="prose prose-invert prose-sm max-w-none">
+                            <ReactMarkdown>{msg.content}</ReactMarkdown>
+                          </div>
                         </div>
                       </div>
                     ))}
