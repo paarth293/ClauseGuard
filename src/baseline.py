@@ -1,7 +1,7 @@
 import os
 from dotenv import load_dotenv
 from groq import Groq
-from ingestion import IngestionPipeline
+from .ingestion import IngestionPipeline
 
 # Load environment variables from the .env file (this loads GROQ_API_KEY)
 load_dotenv()

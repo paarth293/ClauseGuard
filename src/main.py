@@ -1,10 +1,10 @@
 import sys
 import time
-from ingestion import IngestionPipeline
-from analyzer import StructuredAnalyzer
-from verifier import DeterministicVerifier
-from semantic_verifier import SemanticVerifier
-from synthesizer import ReportSynthesizer
+from .ingestion import IngestionPipeline
+from .analyzer import StructuredAnalyzer
+from .verifier import DeterministicVerifier
+from .semantic_verifier import SemanticVerifier
+from .synthesizer import ReportSynthesizer
 
 def run_clauseguard(file_path: str):
     print(f"Starting ClauseGuard review for: {file_path}")

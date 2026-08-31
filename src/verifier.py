@@ -61,8 +61,8 @@ class DeterministicVerifier:
 if __name__ == "__main__":
     import os
     import json
-    from ingestion import IngestionPipeline
-    from analyzer import StructuredAnalyzer
+    from .ingestion import IngestionPipeline
+    from .analyzer import StructuredAnalyzer
     
     print("1. Ingesting...")
     ingestion = IngestionPipeline()

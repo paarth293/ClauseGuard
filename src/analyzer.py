@@ -2,14 +2,14 @@ import os
 import json
 from dotenv import load_dotenv
 from groq import Groq
-from ingestion import IngestionPipeline
+from .ingestion import IngestionPipeline
 
 load_dotenv()
 
 class StructuredAnalyzer:
     def __init__(self):
         self.client = Groq()
-        self.model = "openai/gpt-oss-20b"
+        self.model = "llama-3.1-70b-versatile"
 
     def analyze(self, contract_text: str) -> dict:
         """

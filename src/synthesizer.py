@@ -67,9 +67,9 @@ class ReportSynthesizer:
 # --- Testing Code ---
 if __name__ == "__main__":
     import os
-    from ingestion import IngestionPipeline
-    from analyzer import StructuredAnalyzer
-    from verifier import DeterministicVerifier
+    from .ingestion import IngestionPipeline
+    from .analyzer import StructuredAnalyzer
+    from .verifier import DeterministicVerifier
     
     print("Running the COMPLETE ClauseGuard Pipeline...\n")
     

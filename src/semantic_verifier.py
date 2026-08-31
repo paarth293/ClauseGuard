@@ -75,9 +75,9 @@ class SemanticVerifier:
 
 # --- Testing Code ---
 if __name__ == "__main__":
-    from ingestion import IngestionPipeline
-    from analyzer import StructuredAnalyzer
-    from verifier import DeterministicVerifier
+    from .ingestion import IngestionPipeline
+    from .analyzer import StructuredAnalyzer
+    from .verifier import DeterministicVerifier
     
     print("Running pipeline up to Semantic Verification...")
     test_path = os.path.join(os.path.dirname(__file__), "../contracts/sow_002_seeded.txt")

@@ -87,8 +87,9 @@ export default function Home() {
       } else {
         throw new Error("Invalid response format from server.");
       }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred during analysis.");
+    } catch (err: unknown) {
+      const message = err instanceof Error ? err.message : "An unexpected error occurred during analysis.";
+      setError(message);
     } finally {
       setIsLoading(false);
     }
@@ -219,7 +220,7 @@ export default function Home() {
                     <h3 className="text-lg font-medium">Processing Contract...</h3>
                   </div>
                   <div className="w-full max-w-md h-2 bg-slate-800 rounded-full overflow-hidden">
-                    <div className="h-full bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 animate-[shimmer_2s_infinite] w-[200%] -ml-[100%] rounded-full"></div>
+                    <div className="h-full w-1/2 bg-gradient-to-r from-blue-500 via-purple-500 to-blue-500 rounded-full animate-pulse"></div>
                   </div>
                   <p className="text-sm text-slate-400 mt-4 text-center">
                     Running multi-step pipeline (Ingestion <ChevronRight className="inline w-3 h-3"/> Analysis <ChevronRight className="inline w-3 h-3"/> Verification <ChevronRight className="inline w-3 h-3"/> Synthesis)

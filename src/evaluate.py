@@ -1,9 +1,9 @@
 import os
 import pandas as pd
-from ingestion import IngestionPipeline
-from analyzer import StructuredAnalyzer
-from verifier import DeterministicVerifier
-from semantic_verifier import SemanticVerifier
+from .ingestion import IngestionPipeline
+from .analyzer import StructuredAnalyzer
+from .verifier import DeterministicVerifier
+from .semantic_verifier import SemanticVerifier
 
 def run_evaluation():
     print("Starting ClauseGuard Evaluation Protocol...")
