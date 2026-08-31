@@ -279,6 +279,54 @@ export default function Home() {
                   <CheckCircle className="w-6 h-6 text-green-400" />
                   <h2 className="text-2xl font-bold">Analysis Complete</h2>
                 </div>
+
+                {/* Risk Score Component */}
+                {score !== null && (
+                  <motion.div 
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.2 }}
+                    className="glass-panel rounded-2xl p-6 md:p-8 mb-8 border-l-4" 
+                    style={{
+                      borderColor: score >= 80 ? '#22c55e' : score >= 50 ? '#eab308' : '#ef4444'
+                    }}
+                  >
+                    <div className="flex flex-col md:flex-row items-center justify-between">
+                      <div className="mb-6 md:mb-0 text-center md:text-left">
+                        <h3 className="text-xl font-bold mb-2">Contract Safety Score</h3>
+                        <p className="text-slate-400 text-sm max-w-sm">
+                          {score >= 80 ? 'This contract is highly favorable and safe. Minor issues only.' 
+                            : score >= 50 ? 'Proceed with caution. Some terms are risky and need negotiation.' 
+                            : 'High risk! Major red flags detected. Do not sign without revisions.'}
+                        </p>
+                      </div>
+                      
+                      <div className="relative w-32 h-32 flex items-center justify-center shrink-0">
+                        <svg className="w-full h-full transform -rotate-90">
+                          <circle cx="64" cy="64" r="56" fill="transparent" stroke="#1e293b" strokeWidth="12" />
+                          <motion.circle 
+                            cx="64" cy="64" r="56" fill="transparent" 
+                            stroke={score >= 80 ? '#22c55e' : score >= 50 ? '#eab308' : '#ef4444'} 
+                            strokeWidth="12"
+                            strokeDasharray="351.85"
+                            initial={{ strokeDashoffset: 351.85 }}
+                            animate={{ strokeDashoffset: 351.85 - (351.85 * score) / 100 }}
+                            transition={{ duration: 1.5, ease: "easeOut", delay: 0.4 }}
+                            strokeLinecap="round"
+                          />
+                        </svg>
+                        <div className="absolute inset-0 flex items-center justify-center flex-col">
+                          <span className="text-3xl font-bold tracking-tighter" style={{
+                            color: score >= 80 ? '#4ade80' : score >= 50 ? '#facc15' : '#f87171'
+                          }}>
+                            {score}
+                          </span>
+                          <span className="text-xs text-slate-400 font-medium -mt-1">/ 100</span>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
                 
                 <div className="glass-panel rounded-2xl p-6 md:p-10 border-t-4 border-t-blue-500 relative overflow-hidden">
                   {/* Decorative background element for the report card */}
