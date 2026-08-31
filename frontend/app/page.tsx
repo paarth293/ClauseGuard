@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle, Sparkles } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle, Sparkles, Copy, Check } from 'lucide-react';
 
 export interface Finding {
   clause_ref: string;
@@ -27,6 +27,7 @@ export default function Home() {
   // "Fix it for me" State
   const [loadingAlternatives, setLoadingAlternatives] = useState<Record<number, boolean>>({});
   const [safeClauses, setSafeClauses] = useState<Record<number, string>>({});
+  const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
   // Auto-scroll to report when it's generated
   const reportRef = useRef<HTMLDivElement>(null);
@@ -152,6 +153,12 @@ export default function Home() {
     } finally {
       setLoadingAlternatives(prev => ({ ...prev, [idx]: false }));
     }
+  };
+
+  const handleCopy = (idx: number, text: string) => {
+    navigator.clipboard.writeText(text);
+    setCopiedIdx(idx);
+    setTimeout(() => setCopiedIdx(null), 2000);
   };
 
   return (
@@ -430,6 +437,31 @@ export default function Home() {
                               )}
                               Fix it for me
                             </button>
+                          )}
+
+                          {safeClauses[idx] && (
+                            <motion.div 
+                              initial={{ opacity: 0, height: 0 }}
+                              animate={{ opacity: 1, height: 'auto' }}
+                              className="mt-4 p-4 rounded-lg bg-blue-900/20 border border-blue-500/30 relative"
+                            >
+                              <div className="flex justify-between items-center mb-3">
+                                <h4 className="text-xs font-semibold text-blue-400 uppercase tracking-wide flex items-center">
+                                  <Sparkles className="w-3 h-3 mr-1" />
+                                  Suggested Safe Clause
+                                </h4>
+                                <button 
+                                  onClick={() => handleCopy(idx, safeClauses[idx])}
+                                  className="text-slate-400 hover:text-white transition-colors"
+                                  title="Copy to clipboard"
+                                >
+                                  {copiedIdx === idx ? <Check className="w-4 h-4 text-green-400" /> : <Copy className="w-4 h-4" />}
+                                </button>
+                              </div>
+                              <p className="text-sm text-slate-200 font-serif leading-relaxed whitespace-pre-wrap">
+                                {safeClauses[idx]}
+                              </p>
+                            </motion.div>
                           )}
                         </div>
                       </motion.div>
