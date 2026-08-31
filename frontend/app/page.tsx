@@ -210,34 +210,43 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen bg-[#0f172a] text-slate-50 overflow-hidden relative selection:bg-blue-500/30 print:bg-white print:text-black">
+    <main className="min-h-screen bg-black text-slate-50 overflow-hidden relative selection:bg-white/20 print:bg-white print:text-black font-sans">
       
-      {/* Dynamic Background Elements */}
-      <div className="fixed inset-0 z-0 pointer-events-none print:hidden">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-blue-600/20 blur-[120px] mix-blend-screen animate-pulse-glow" style={{ animationDuration: '4s' }}></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-purple-600/20 blur-[120px] mix-blend-screen animate-pulse-glow" style={{ animationDuration: '6s', animationDelay: '1s' }}></div>
+      {/* Dynamic Background Elements - Minimal & Professional */}
+      <div className="fixed inset-0 z-0 pointer-events-none print:hidden overflow-hidden flex justify-center">
+        {/* Spotlight effect from top */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[80vw] h-[500px] bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-blue-900/5 to-transparent opacity-60"></div>
+        
+        {/* Very subtle noise texture for premium feel */}
+        <div className="absolute inset-0 opacity-[0.03] mix-blend-overlay bg-[url('https://grainy-gradients.vercel.app/noise.svg')]"></div>
       </div>
 
       <div className="relative z-10 max-w-5xl mx-auto px-6 py-12 md:py-20 flex flex-col items-center min-h-screen">
         
         {/* Header Section */}
         <motion.div 
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="text-center mb-16 w-full print:hidden"
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="text-center mb-16 w-full print:hidden relative z-10 pt-10"
         >
-          <div className="inline-flex items-center justify-center space-x-3 mb-6 bg-slate-800/50 backdrop-blur-sm border border-slate-700/50 px-5 py-2 rounded-full shadow-lg">
-            <ShieldCheck className="w-6 h-6 text-blue-400" />
-            <h1 className="text-xl font-medium tracking-wide">ClauseGuard</h1>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="inline-flex items-center justify-center space-x-2 mb-8 bg-white/5 backdrop-blur-xl border border-white/10 px-4 py-1.5 rounded-full hover:bg-white/10 transition-colors cursor-default"
+          >
+            <Sparkles className="w-4 h-4 text-blue-400" />
+            <span className="text-xs font-medium tracking-wide text-slate-300">Introducing ClauseGuard AI</span>
+          </motion.div>
           
-          <h2 className="text-4xl md:text-6xl font-bold mb-6 leading-tight">
-            Protect your <span className="text-gradient">Freelance Contracts</span><br/> with AI Precision
+          <h2 className="text-5xl md:text-7xl font-bold mb-6 leading-tight tracking-tighter text-white">
+            Contract analysis, <br/>
+            <span className="text-transparent bg-clip-text bg-gradient-to-r from-slate-300 via-white to-slate-400">perfected by AI.</span>
           </h2>
           
-          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed">
-            Upload your contract and our multi-step AI pipeline will analyze it for risks, scope creep, and payment terms in seconds.
+          <p className="text-lg md:text-xl text-slate-400 max-w-2xl mx-auto leading-relaxed font-light">
+            Upload any freelance contract. Our advanced pipeline identifies hidden risks, scope creep, and payment vulnerabilities in seconds.
           </p>
         </motion.div>
 
@@ -246,37 +255,44 @@ export default function Home() {
           
           {/* Upload Component */}
           <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="w-full mb-10 print:hidden"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, delay: 0.4, ease: "easeOut" }}
+            className="w-full mb-12 print:hidden relative group"
           >
             <div 
-              className={`glass-panel rounded-2xl p-8 transition-all duration-300 border-2 ${
-                dragActive ? 'border-blue-500 bg-slate-800/80 shadow-[0_0_30px_rgba(59,130,246,0.3)]' : 'border-slate-700/50 hover:border-slate-600/80'
+              className={`relative z-10 rounded-2xl border transition-all duration-300 overflow-hidden ${
+                dragActive ? 'border-blue-500/50 bg-blue-500/5 scale-[1.01]' : 'border-white/10 bg-white/[0.02] hover:border-white/20 hover:bg-white/[0.04]'
               }`}
               onDragEnter={handleDrag}
               onDragLeave={handleDrag}
               onDragOver={handleDrag}
               onDrop={handleDrop}
             >
-              <div className="flex flex-col items-center justify-center text-center py-6">
-                <div className={`p-4 rounded-full mb-6 transition-colors duration-300 ${file ? 'bg-green-500/10' : 'bg-blue-500/10'}`}>
-                  {file ? (
-                    <FileText className="w-10 h-10 text-green-400 animate-float" />
-                  ) : (
-                    <Upload className="w-10 h-10 text-blue-400 animate-float" />
-                  )}
+              <div className="absolute inset-0 backdrop-blur-3xl -z-10"></div>
+              
+              <div className="flex flex-col items-center justify-center text-center py-16 px-8">
+                
+                <div className="relative mb-6">
+                  <div className={`p-4 rounded-2xl border transition-colors duration-300 ${
+                    file ? 'bg-white/10 border-white/20 text-white' : 'bg-white/5 border-white/10 text-slate-400 group-hover:text-white'
+                  }`}>
+                    {file ? (
+                      <FileText className="w-8 h-8" />
+                    ) : (
+                      <Upload className="w-8 h-8" />
+                    )}
+                  </div>
                 </div>
                 
-                <h3 className="text-xl font-semibold mb-2">
-                  {file ? 'File ready for analysis' : 'Upload your contract'}
+                <h3 className="text-xl font-medium mb-2 text-white">
+                  {file ? 'File ready for analysis' : 'Upload document'}
                 </h3>
                 
-                <p className="text-slate-400 mb-8 max-w-md">
+                <p className="text-slate-400 mb-8 max-w-sm text-sm">
                   {file 
-                    ? <span className="text-slate-300 font-medium">{file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
-                    : 'Drag and drop your .txt, .pdf, or .docx file here, or click to browse.'}
+                    ? <span className="text-slate-300 bg-white/10 px-2 py-1 rounded">{file.name} ({(file.size / 1024).toFixed(1)} KB)</span>
+                    : 'Drag and drop your .txt, .pdf, or .docx file here, or click to browse files from your computer.'}
                 </p>
 
                 <input
@@ -287,29 +303,28 @@ export default function Home() {
                   onChange={handleChange}
                 />
                 
-                <div className="flex space-x-4">
+                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 w-full sm:w-auto">
                   <button
                     onClick={onButtonClick}
-                    className="px-6 py-3 rounded-lg font-medium bg-slate-800 hover:bg-slate-700 border border-slate-700 transition-colors focus:outline-none focus:ring-2 focus:ring-slate-500"
+                    className="px-6 py-2.5 rounded-lg text-sm font-medium bg-white/5 hover:bg-white/10 border border-white/10 text-white transition-all w-full sm:w-auto focus:ring-2 focus:ring-white/20"
                   >
-                    {file ? 'Change File' : 'Select File'}
+                    {file ? 'Change file' : 'Browse files'}
                   </button>
                   
                   {file && (
                     <button
                       onClick={handleUpload}
                       disabled={isLoading}
-                      className="px-8 py-3 rounded-lg font-medium bg-blue-600 hover:bg-blue-500 text-white shadow-lg shadow-blue-500/20 transition-all flex items-center group disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:bg-blue-600"
+                      className="px-6 py-2.5 rounded-lg text-sm font-medium bg-white text-black hover:bg-slate-200 transition-all flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
                     >
                       {isLoading ? (
                         <>
-                          <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                          Analyzing...
+                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                          Analyzing
                         </>
                       ) : (
                         <>
-                          Analyze Contract
-                          <ChevronRight className="w-5 h-5 ml-1 group-hover:translate-x-1 transition-transform" />
+                          Analyze document
                         </>
                       )}
                     </button>
