@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import ReactMarkdown from 'react-markdown';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle } from 'lucide-react';
+import { Upload, FileText, CheckCircle, AlertCircle, Loader2, ShieldCheck, ChevronRight, DollarSign, ShieldAlert, Copyright, Briefcase, FileWarning, AlertTriangle, Sparkles } from 'lucide-react';
 
 export interface Finding {
   clause_ref: string;
@@ -23,6 +23,10 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  
+  // "Fix it for me" State
+  const [loadingAlternatives, setLoadingAlternatives] = useState<Record<number, boolean>>({});
+  const [safeClauses, setSafeClauses] = useState<Record<number, string>>({});
 
   // Auto-scroll to report when it's generated
   const reportRef = useRef<HTMLDivElement>(null);
@@ -75,6 +79,7 @@ export default function Home() {
     setReport(null);
     setFindings(null);
     setScore(null);
+    setSafeClauses({});
   };
 
   const onButtonClick = () => {
@@ -92,6 +97,7 @@ export default function Home() {
     setReport(null);
     setFindings(null);
     setScore(null);
+    setSafeClauses({});
 
     const formData = new FormData();
     formData.append('file', file);
@@ -120,6 +126,31 @@ export default function Home() {
       setError(message);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleGenerateAlternative = async (idx: number, finding: Finding) => {
+    setLoadingAlternatives(prev => ({ ...prev, [idx]: true }));
+    try {
+      const response = await fetch('http://localhost:8000/generate-alternative', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          risky_clause: finding.quote,
+          category: finding.category,
+          explanation: finding.explanation
+        })
+      });
+
+      if (!response.ok) throw new Error("Failed to generate alternative");
+      
+      const data = await response.json();
+      setSafeClauses(prev => ({ ...prev, [idx]: data.safe_clause }));
+    } catch (err) {
+      console.error(err);
+      setSafeClauses(prev => ({ ...prev, [idx]: "Error generating alternative clause. Please try again." }));
+    } finally {
+      setLoadingAlternatives(prev => ({ ...prev, [idx]: false }));
     }
   };
 
@@ -384,7 +415,22 @@ export default function Home() {
                         
                         <div>
                           <h4 className="text-xs font-semibold text-slate-500 mb-2 uppercase tracking-wide">Risk Explanation</h4>
-                          <p className="text-slate-200 leading-relaxed text-sm">{finding.explanation}</p>
+                          <p className="text-slate-200 leading-relaxed text-sm mb-4">{finding.explanation}</p>
+                          
+                          {!safeClauses[idx] && (
+                            <button
+                              onClick={() => handleGenerateAlternative(idx, finding)}
+                              disabled={loadingAlternatives[idx]}
+                              className="inline-flex items-center px-4 py-2 bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 text-sm font-medium rounded-lg transition-colors border border-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                              {loadingAlternatives[idx] ? (
+                                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                              ) : (
+                                <Sparkles className="w-4 h-4 mr-2" />
+                              )}
+                              Fix it for me
+                            </button>
+                          )}
                         </div>
                       </motion.div>
                     ))}
