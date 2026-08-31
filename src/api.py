@@ -14,6 +14,7 @@ from .semantic_verifier import SemanticVerifier
 from .synthesizer import ReportSynthesizer
 from .scorer import RiskScorer
 from .generator import ClauseGenerator
+from .chat import ContractChatbot
 
 app = FastAPI(title="ClauseGuard API")
 
@@ -30,6 +31,10 @@ class GenerateAlternativeRequest(BaseModel):
     risky_clause: str
     category: str
     explanation: str
+
+class ChatRequest(BaseModel):
+    contract_text: str
+    question: str
 
 @app.get("/")
 async def root():
@@ -81,7 +86,8 @@ async def analyze_contract(file: UploadFile = File(...)):
         return {
             "report": final_report,
             "findings": sem_verified,
-            "score": score
+            "score": score,
+            "contract_text": parsed_text
         }
         
     except Exception as e:
@@ -107,6 +113,18 @@ async def generate_alternative(request: GenerateAlternativeRequest):
     )
     
     return {"safe_clause": safe_clause}
+
+@app.post("/chat")
+async def chat_with_contract(request: ChatRequest):
+    """
+    Answers a question based on the contract context.
+    """
+    print(f"\n--- Chat Request Received: {request.question} ---")
+    
+    chatbot = ContractChatbot()
+    answer = await chatbot.answer_question(request.contract_text, request.question)
+    
+    return {"answer": answer}
 
 if __name__ == "__main__":
     # Start the server on port 8000
